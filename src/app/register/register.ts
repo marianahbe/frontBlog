@@ -5,11 +5,13 @@ import { UserRegister } from '../models/user-register.interface';
 import { passwordMatchValidator } from '../validator/password.validator';
 
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
@@ -19,7 +21,8 @@ export class Register implements OnInit{
 
   constructor(
     private fb: FormBuilder,
-    private authService: Auth
+    private authService: Auth,
+    private router: Router
   ){}
 
   ngOnInit(): void{
@@ -38,6 +41,7 @@ export class Register implements OnInit{
         next: (response) => {
           console.log('Registro exitoso', response);
           alert('Usuario registrado con éxito');
+          this.router.navigate(['/home']);
         },
         error: (error) => {
           console.error('Error en el registro', error);
