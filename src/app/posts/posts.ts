@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostsModel } from '../models/posts.interface';
+import { PostsModel, PostsResponse } from '../models/posts.interface';
 import { PostsService } from '../services/posts.service';
 
 @Component({
@@ -17,8 +17,8 @@ export class Posts {
   
   ngOnInit(): void {
     this.postsService.getPosts().subscribe({
-      next: (data) => {
-        this.posts = data;
+      next: (response: PostsResponse) => {
+        this.posts = response.results;
         console.log('Posts Cargados:', this.posts);
       },
       error: (err) => {
