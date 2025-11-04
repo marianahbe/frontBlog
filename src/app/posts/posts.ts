@@ -17,8 +17,12 @@ export class Posts {
   
   ngOnInit(): void {
     this.postsService.getPosts().subscribe({
-      next: (response: PostsResponse) => {
-        this.posts = response.results;
+      next: (response: any) => {
+        this.posts = response.results.map((post: PostsModel) => ({ 
+            ...post, /* Copia las propiedades del objeto post para luego sobreescribir si se muestran o no */
+            showLikers: false, 
+            showCommenters: false 
+        }));
         console.log('Posts Cargados:', this.posts);
       },
       error: (err) => {
@@ -26,4 +30,24 @@ export class Posts {
       }
     });
   }
+  showLikers(post: PostsModel): void {
+    this.posts.forEach(p => p.showLikers = false);
+    post.showLikers = true;
+    post.showCommenters = false;
+  }
+
+  hideLikers(post: PostsModel): void {
+    post.showLikers = false;
+  }
+
+  showCommenters(post: PostsModel): void {
+    this.posts.forEach(p => p.showCommenters = false);
+    post.showLikers = false;
+    post.showCommenters = true;
+  }
+
+  hideCommenters(post: PostsModel): void {
+    post.showCommenters = false;
+  }
+
 }

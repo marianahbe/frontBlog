@@ -18,6 +18,9 @@ import { RouterLink } from '@angular/router';
 
 export class Register implements OnInit{
   registerForm!: FormGroup; // instancia de la clase, asignación definitiva
+  passwordVisible: boolean = false;
+  passwordConfVisible: boolean = false;
+
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +37,13 @@ export class Register implements OnInit{
     }, { validators: passwordMatchValidator });
   }
 
+  togglePasswordVisibility(): void {
+      this.passwordVisible = !this.passwordVisible;
+  }
+
+  togglePasswordConfVisibility(): void {
+      this.passwordConfVisible = !this.passwordConfVisible;
+  }
   onSubmit(): void {
     if (this.registerForm.valid) {
       const userData: UserRegister = this.registerForm.value;
@@ -41,7 +51,7 @@ export class Register implements OnInit{
         next: (response) => {
           console.log('Registro exitoso', response);
           alert('Usuario registrado con éxito');
-          this.router.navigate(['/home']);
+          this.router.navigate(['/login']);
         },
         error: (error) => {
           console.error('Error en el registro', error);

@@ -11,10 +11,20 @@ export interface PostsModel {
     content: string;
     excerpt: string;
     timestamp: string;
+
+    likes_count: number;    
+    comments_count: number;
+
+    likers: string[];
+    commenters: string[];
+
+    showLikers?: boolean;
+    showCommenters?: boolean;
+
     author_access: AccessPermission;
     team_access: AccessPermission;
     authenticated_access: AccessPermission;
-    public_access: string;
+    public_access: AccessPermission;
 }
 
 export interface PostsResponse {

@@ -15,6 +15,8 @@ import { RouterLink } from '@angular/router';
 })
 export class Login implements OnInit{
   loginForm!: FormGroup;
+  passwordVisible: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private authService: Auth,
@@ -28,6 +30,10 @@ export class Login implements OnInit{
     })
   }
 
+  togglePasswordVisibility(): void {
+      this.passwordVisible = !this.passwordVisible;
+  }
+
   onSubmit(): void {
     if (this.loginForm.valid){
       const credentials: UserLogin = this.loginForm.value;
@@ -35,7 +41,7 @@ export class Login implements OnInit{
       this.authService.loginUser(credentials).subscribe({
         next: (response) => {
           console.log('Login exitoso, se guardó el token', response);
-          this.router.navigate(['/home']);
+          this.router.navigate(['/posts']);
         },
         error: (error) => {
           console.error('Error en el login', error);
