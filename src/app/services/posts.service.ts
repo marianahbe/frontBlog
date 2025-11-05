@@ -11,7 +11,8 @@ export class PostsService {
 
   constructor(private http: HttpClient){ }
   
-  getPosts(): Observable<PostsResponse>{
+  getPosts(url?: string): Observable<PostsResponse>{
+    const fetchUrl = url || this.apiUrl;
     return this.http.get<PostsResponse>(this.apiUrl);
   }
 }

@@ -21,10 +21,10 @@ export interface PostsModel {
     showLikers?: boolean;
     showCommenters?: boolean;
 
-    author_access: AccessPermission;
+    author_access: 'Read & Edit';
     team_access: AccessPermission;
     authenticated_access: AccessPermission;
-    public_access: AccessPermission;
+    public_access: 'Read Only' | 'None';
 }
 
 export interface PostsResponse {

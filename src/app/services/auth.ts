@@ -19,7 +19,11 @@ export class Auth {
   loginUser(credentials: UserLogin): Observable<AuthResponse>{
     return this.http.post<AuthResponse>(`${this.apiUrl}login/`, credentials).pipe(
       tap(response => {
-        localStorage.setItem('auth_token', response.token);
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user_data', JSON.stringify(response.user_data));
+      
+        console.log('Rol del usuario:', response.user_data.role);
+        console.log('ID del Equipo:', response.user_data.team_id);
       })
     )
   }

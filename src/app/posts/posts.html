@@ -46,9 +46,29 @@
                 Fecha: {{ post.timestamp | date:'shortDate' }}
             </span>
             
-            <button class="btn btn-sm btn-primary">
+            <button class="btn btn-sm btn-primary" (click)="readMore(post)">
                 Leer más
             </button>
         </div>
+    </div>
+
+    <div *ngIf="posts.length > 0" class="pagination-controls">
+        <button 
+            (click)="goToPreviousPage()" 
+            [disabled]="!previousPageUrl" 
+            class="btn nav">
+            &lt;
+        </button>
+
+        <span class="page-info">
+            **{{ getPaginationRange() }}** de **{{ totalPosts }}**
+        </span>
+
+        <button 
+            (click)="goToNextPage()" 
+            [disabled]="!nextPageUrl" 
+            class="btn nav">
+            &gt;
+        </button>
     </div>
 </div>
