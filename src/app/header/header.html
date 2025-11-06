@@ -1,0 +1,28 @@
+<header class="app-header">
+    <div class="logo">
+        <a routerLink="/">
+            <img src="/images/Logo-AvanzaTech-Grad-B.svg" alt="Logo avanzatech">
+        </a>
+    </div>
+
+    <nav>
+        <ul>
+            <ng-container *ngIf="!(isLoggedIn$ | async)">
+                <li>
+                    <a [routerLink]="['/login']">Ingresar</a>
+                </li>
+                <li>
+                    <a [routerLink]="['/register']">Registrarse</a>
+                </li>
+            </ng-container>
+
+            <ng-container *ngIf="currentUser$ | async as user">
+                <li *ngIf="isLoggedIn$ | async">
+                    Hola, {{ user.username }} </li>
+                <li *ngIf="isLoggedIn$ | async">
+                    <a (click)="logout()">Cerrar Sesión</a>
+                </li>
+            </ng-container>
+        </ul>
+    </nav>
+</header>

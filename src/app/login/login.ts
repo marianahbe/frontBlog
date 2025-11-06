@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/auth';
 import { UserLogin } from '../models/user-login.interface';
 import { RouterLink } from '@angular/router';
 
@@ -19,7 +19,7 @@ export class Login implements OnInit{
 
   constructor(
     private fb: FormBuilder,
-    private authService: Auth,
+    private authService: AuthService,
     private router: Router
   ){}
 

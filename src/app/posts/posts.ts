@@ -1,13 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostsModel, PostsResponse } from '../models/posts.interface';
 import { PostsService } from '../services/posts.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth';
+import { MatIconModule } from '@angular/material/icon';
+import { Observable } from 'rxjs';
+import { Header } from '../header/header';
+import { PaginationService, POSTS_PER_PAGE, LIKES_PER_DETAIL_PAGE, COMMENTS_PER_DETAIL_PAGE } from '../services/pagination.service';
 
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule, Header],
   templateUrl: './posts.html',
   styleUrl: './posts.scss',
 })
@@ -19,21 +24,25 @@ export class Posts {
   previousPageUrl: string | null = null;
   currentPageUrl: string = '';
 
-  pageSize: number = 10;
+  pageSize: number = POSTS_PER_PAGE;
   currentPage: number = 1;
+
+  isUserAuthenticated$!: Observable<boolean>;
 
   constructor(
     private postsService: PostsService,
-    private router: Router
+    private router: Router, 
+    private authService: AuthService,
+    private paginationService: PaginationService
   ){ }
   
   ngOnInit(): void {
     this.loadPosts();
+    this.isUserAuthenticated$ = this.authService.isLoggedIn;
   }
 
   loadPosts(url?: string): void {
-    this.currentPage = this.getCurrentPageNumber(url);
-
+    this.currentPage = this.paginationService.getCurrentPageNumber(url || null);
     this.postsService.getPosts(url).subscribe({
       next: (response: PostsResponse) => {
         this.posts = response.results.map((post: PostsModel) => ({ 
@@ -57,23 +66,12 @@ export class Posts {
     this.router.navigate(['/post', post.id]);
   }
 
-  getCurrentPageNumber(url: string | undefined): number{
-    if (!url){
-      return 1;
-    }
-    /* Paginador ?page= */
-    const urlParams = new URLSearchParams(url.split('?')[1]);
-    const page = urlParams.get('page');
-    return page ? parseInt(page, 10) : 1;
-  }
-
   getPaginationRange(): string{
-    if (this.totalPosts === 0){
-      return '';
-    }
-    const startIndex = (this.currentPage - 1) * this.pageSize + 1;
-    const endIndex = Math.min(this.currentPage * this.pageSize, this.totalPosts);
-    return `${startIndex}-${endIndex}`;
+    return this.paginationService.getPaginationRange(
+        this.currentPage,
+        this.pageSize,
+        this.totalPosts
+    );
   }
 
   goToNextPage(): void {
@@ -98,14 +96,31 @@ export class Posts {
     post.showLikers = false;
   }
 
-  showCommenters(post: PostsModel): void {
-    this.posts.forEach(p => p.showCommenters = false);
-    post.showLikers = false;
-    post.showCommenters = true;
+  onLike(post: PostsModel): void {
+    this.postsService.toggleLike(post.id).subscribe({
+      next: (response) => {
+        // Actualiza el estado local del post
+        if (response.liked) {
+          console.log('Likeo');
+          // Incrementa el contador
+          post.likes_count += 1; 
+        } else {
+          console.log('Des Likeo');
+          // Decrementa el contador
+          post.likes_count -= 1;
+        }
+        
+        // Opcional: Recargar los posts o actualizar solo este post para obtener los datos correctos del backend
+        // this.loadPosts(); 
+      },
+      error: (err) => {
+        console.error('Error al intentar dar like:', err);
+      }
+    });
   }
 
-  hideCommenters(post: PostsModel): void {
-    post.showCommenters = false;
+  onComment(post: PostsModel): void {
+
   }
 
 }

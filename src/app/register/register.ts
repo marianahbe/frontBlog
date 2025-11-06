@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Auth } from '../services/auth';
+import { AuthService } from '../services/auth';
 import { UserRegister } from '../models/user-register.interface';
 import { passwordMatchValidator } from '../validator/password.validator';
 
@@ -24,7 +24,7 @@ export class Register implements OnInit{
 
   constructor(
     private fb: FormBuilder,
-    private authService: Auth,
+    private authService: AuthService,
     private router: Router
   ){}
 

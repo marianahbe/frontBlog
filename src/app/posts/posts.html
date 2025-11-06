@@ -1,4 +1,7 @@
+<app-header></app-header>
+
 <div class="posts-list-container">
+
     <h2>Últimas Publicaciones</h2>
 
     <div *ngIf="posts.length === 0" class="loading-message">
@@ -6,7 +9,7 @@
     </div>
 
     <div *ngFor="let post of posts" class="post-card">
-        
+
         <div class="card-header">
             <h3>{{ post.title }}</h3>
         </div>
@@ -17,18 +20,18 @@
 
         <div class="card-footer">
             <span class="footer-stat likes-container" (mouseenter)="showLikers(post)" (mouseleave)="hideLikers(post)">
-                <strong>{{ post.likes_count }}</strong> 
+                <strong>{{ post.likes_count }}</strong>
                 {{ post.likes_count === 1 ? 'Like' : 'Likes' }}
                 <div *ngIf="post.showLikers && post.likers.length > 0" class="users-list-popup">
                     <div class="popup-arrow"></div>
                     <ul>
                         <li *ngFor="let liker of post.likers">{{ liker }}</li>
                     </ul>
-                </div> 
+                </div>
             </span>
-            
+
             <span class="footer-stat comments" (mouseenter)="showCommenters(post)" (mouseleave)="hideCommenters(post)">
-                <strong>{{ post.comments_count }}</strong> 
+                <strong>{{ post.comments_count }}</strong>
                 {{ post.comments_count === 1 ? 'Comentario' : 'Comentarios' }}
                 <div *ngIf="post.showCommenters && post.commenters.length > 0" class="users-list-popup">
                     <div class="popup-arrow"></div>
@@ -45,29 +48,40 @@
             <span class="timestamp">
                 Fecha: {{ post.timestamp | date:'shortDate' }}
             </span>
-            
+
             <button class="btn btn-sm btn-primary" (click)="readMore(post)">
                 Leer más
             </button>
         </div>
+        <div class="post-actions">
+
+            <ng-container *ngIf="isUserAuthenticated$">
+                <button (click)="onLike(post)" class="btn btn-like" type="button">
+                    <mat-icon>favorite</mat-icon>
+                </button>
+
+                <button class="btn btn-comment" type="button">
+                    <mat-icon>comment</mat-icon>
+                </button>
+            </ng-container>
+
+            <p *ngIf="!isUserAuthenticated$" class="auth-message">
+                Debes <a routerLink="/login">iniciar sesión</a> para interactuar.
+            </p>
+
+        </div>
     </div>
 
     <div *ngIf="posts.length > 0" class="pagination-controls">
-        <button 
-            (click)="goToPreviousPage()" 
-            [disabled]="!previousPageUrl" 
-            class="btn nav">
+        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl" class="btn nav">
             &lt;
         </button>
 
         <span class="page-info">
-            **{{ getPaginationRange() }}** de **{{ totalPosts }}**
+            {{ getPaginationRange() }} de {{ totalPosts }}
         </span>
 
-        <button 
-            (click)="goToNextPage()" 
-            [disabled]="!nextPageUrl" 
-            class="btn nav">
+        <button (click)="goToNextPage()" [disabled]="!nextPageUrl" class="btn nav">
             &gt;
         </button>
     </div>

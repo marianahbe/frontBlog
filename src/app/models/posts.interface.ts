@@ -12,12 +12,9 @@ export interface PostsModel {
     excerpt: string;
     timestamp: string;
 
-    likes_count: number;    
+    likes_count: number; 
     comments_count: number;
-
-    likers: string[];
-    commenters: string[];
-
+    
     showLikers?: boolean;
     showCommenters?: boolean;
 
@@ -27,9 +24,27 @@ export interface PostsModel {
     public_access: 'Read Only' | 'None';
 }
 
-export interface PostsResponse {
+export interface LikeItem {
+    id: number;
+    user_id: number;
+    post: number;
+    username: string; 
+}
+
+export interface CommentItem {
+    id: number;
+    username: string;
+    content: string;
+    timestamp: string;
+}
+
+export interface PaginatedResponse<T> {
     count: number;
     next: string | null;
     previous: string | null;
-    results: PostsModel[];
+    results: T[];
 }
+
+export type PostsResponse = PaginatedResponse<PostsModel>;
+export type LikesResponse = PaginatedResponse<LikeItem>;
+export type CommentsResponse = PaginatedResponse<CommentItem>;
