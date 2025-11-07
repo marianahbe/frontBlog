@@ -1,0 +1,109 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;             // Usar flexbox 
+    justify-content: center;   // Centrar el hijo horizontalmente
+    align-items: center;       // Centrar el hijo verticalmente 
+    min-height: 100vh;         // El contenedor ocupa al menos toda la altura de la vista
+    margin: 0;                 // Eliminar los márgenes predeterminados del body 
+}
+
+// Caja que envuelve el formulario
+.login-container {
+    background-color: #ffffff;
+    padding: 2rem 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    max-width: 450px; // Ancho máximo del registro
+
+    width: 90%;
+    margin: 1.5rem auto;
+
+    // Centrar el contenido
+    text-align: center; 
+
+    h2 {
+        padding-bottom: 1rem;
+    }
+    
+    // Estilos para los botones Registrar y Cancelar
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .btn-primary {
+            width: 100%;
+            max-width: 250px; 
+            margin-top: 0.75rem;
+        }
+    }
+    .row-buttons {
+        display: flex;
+        gap: 16px; // Espacio entre los botones
+    }
+}
+
+
+// Estilos para los grupos de formulario y el botón de visibilidad de contraseña
+.form-group {
+    position: relative;
+    margin-bottom: 0.5rem;
+
+    label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        // En móvil, el text-align: center del .register-container lo centrará
+        // En desktop, el text-align: left del .register-container lo alineará
+    }
+
+    .alert {
+        color: #0038ee; // Color rojo para errores
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        text-align: left;
+        min-height: 1.25rem;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.2s; 
+    }
+
+    .alert.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+    
+    // Estilo para los inputs
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+    }
+    
+    // Botón de toggle de visibilidad de contraseña
+    .btn-toggle {
+        position: absolute;
+        right: 0rem;
+        top: 50%; // Ajusta para alinear con el input
+        transform: translateY(-50%);
+        height: auto;
+        display: flex;
+        align-items: center;
+        background-color: transparent;
+        border: none;
+        color: #4b5563;
+        font-size: 0.85rem;
+        cursor: pointer;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

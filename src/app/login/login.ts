@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { UserLogin } from '../models/user-login.interface';
 import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatIconModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

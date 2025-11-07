@@ -11,6 +11,7 @@
                 <li>
                     <a [routerLink]="['/login']">Ingresar</a>
                 </li>
+
                 <li>
                     <a [routerLink]="['/register']">Registrarse</a>
                 </li>
@@ -18,9 +19,16 @@
 
             <ng-container *ngIf="currentUser$ | async as user">
                 <li *ngIf="isLoggedIn$ | async">
-                    Hola, {{ user.username }} </li>
+                    Hola, {{ user.username }} 
+                </li>
+
                 <li *ngIf="isLoggedIn$ | async">
                     <a (click)="logout()">Cerrar Sesión</a>
+                </li>
+                <li *ngIf="isLoggedIn$ | async">
+                    <button (click)="logout()" class="btn btn-logout" type="button">
+                        <mat-icon>logout</mat-icon>
+                    </button>
                 </li>
             </ng-container>
         </ul>
