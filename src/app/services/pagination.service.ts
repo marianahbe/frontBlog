@@ -17,7 +17,8 @@ export class PaginationService {
             return 1;
         }
         /* Paginador ?page= */
-        const urlParams = new URLSearchParams(url.split('?')[1]);
+        const paramsString = url.includes('?') ? url.split('?')[1] : '';
+        const urlParams = new URLSearchParams(paramsString);
         const page = urlParams.get('page');
         return page ? parseInt(page, 10) : 1;
     }

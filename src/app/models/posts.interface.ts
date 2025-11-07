@@ -14,6 +14,11 @@ export interface PostsModel {
 
     likes_count: number; 
     comments_count: number;
+
+    likers: LikeItem[]; 
+
+    likersNextUrl: string | null;
+    likersPreviousUrl: string | null;
     
     showLikers?: boolean;
     showCommenters?: boolean;

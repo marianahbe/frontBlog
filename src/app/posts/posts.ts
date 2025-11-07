@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostsModel, PostsResponse } from '../models/posts.interface';
+import { PostsModel, PostsResponse, LikesResponse } from '../models/posts.interface';
 import { PostsService } from '../services/posts.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth';
@@ -48,7 +48,8 @@ export class Posts {
         this.posts = response.results.map((post: PostsModel) => ({ 
             ...post, /* Copia las propiedades del objeto post para luego sobreescribir si se muestran o no */
             showLikers: false, 
-            showCommenters: false 
+            likersNextUrl: null, // Inicialización del estado de paginación de Likers
+            likersPreviousUrl: null,
         }));
         /* Metadatos de la paginación */
         this.totalPosts = response.count;
@@ -62,7 +63,29 @@ export class Posts {
     });
   }
 
-  readMore(post: PostsModel): void {
+  loadLikers(post: PostsModel, url?: string): void {
+    const fetchUrl = url || `/api/post/${post.id}/likes/`;
+    
+    this.postsService.getLikers(fetchUrl).subscribe({
+        next: (response: LikesResponse) => {
+            const postToUpdate = this.posts.find(p => p.id === post.id);
+            
+            if (postToUpdate) {
+                postToUpdate.likers = response.results;
+                
+                postToUpdate.likersNextUrl = response.next;
+                postToUpdate.likersPreviousUrl = response.previous;
+                
+                this.showLikers(postToUpdate);
+            }
+        },
+        error: (err) => {
+            console.error('Error al cargar los likers:', err);
+        }
+    });
+}
+
+  goToPostDetail(post: PostsModel): void {
     this.router.navigate(['/post', post.id]);
   }
 
@@ -118,9 +141,4 @@ export class Posts {
       }
     });
   }
-
-  onComment(post: PostsModel): void {
-
-  }
-
 }
