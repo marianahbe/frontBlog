@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PostsResponse, LikesResponse } from '../models/posts.interface';
+import { PostsResponse, LikesResponse, CommentsResponse } from '../models/posts.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +24,11 @@ export class PostsService {
   getLikers(url?: string): Observable<LikesResponse> {
     const fetchUrl = url || this.apiUrl;
     return this.http.get<LikesResponse>(fetchUrl);
+  }
+
+  getCommenters(url?: string): Observable<CommentsResponse> {
+    const fetchUrl = url || this.apiUrl;
+    return this.http.get<CommentsResponse>(fetchUrl);
   }
 
 }

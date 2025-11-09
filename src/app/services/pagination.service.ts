@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 export const POSTS_PER_PAGE = 10;
-export const COMMENTS_PER_DETAIL_PAGE = 5;
-export const LIKES_PER_DETAIL_PAGE = 15;
+export const COMMENTS_PER_PAGE = 5;
+export const LIKES_PER_PAGE = 15;
 
 @Injectable({
   providedIn: 'root'
