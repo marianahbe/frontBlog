@@ -52,10 +52,19 @@
             <ng-container *ngIf="isUserAuthenticated$ | async">
                 <button (click)="onLike(post)" class="btn btn-like" [ngClass]="{'liked': isLikedByCurrentUser(post)}" type="button">
                     <mat-icon>{{ isLikedByCurrentUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
-               </button>
+                </button>
 
                 <button (click)="goToPostDetail(post)" class="btn btn-comment" type="button">
                     <mat-icon>comment</mat-icon>
+                </button>
+            </ng-container>
+            <ng-container *ngIf="(isUserAuthenticated$ | async) && canEditOrDelete(post)">
+                <button (click)="goToPostDetail(post)" class="btn btn-edit" type="button" title="Editar">
+                    <mat-icon>edit</mat-icon>
+                </button>
+
+                <button (click)="onDelete(post)" class="btn btn-delete" type="button" title="Eliminar">
+                    <mat-icon>delete</mat-icon>
                 </button>
             </ng-container>
         </div>

@@ -31,4 +31,7 @@ export class PostsService {
     return this.http.get<CommentsResponse>(fetchUrl);
   }
 
+  deletePost(postId: number): Observable<any> {
+    return this.http.post<any>(`${this.UrlLyC}${postId}/delete/`, {});
+  }
 }

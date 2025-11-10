@@ -7,6 +7,7 @@ export enum AccessPermission {
 export interface PostsModel {
     id: number;
     author: string;
+    author_team: string;
     title: string;
     content: string;
     excerpt: string;
