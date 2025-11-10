@@ -1,0 +1,25 @@
+<div class="likes-container">
+    <div *ngIf="likes.length > 0" class="likers-list">
+        <ul>
+            <li *ngFor="let like of likes">{{ like.username }}</li>
+        </ul>
+    </div>
+    
+    <div *ngIf="likes.length === 0" class="loading-message">
+        Cargando nombres...
+    </div>
+
+    <div *ngIf="likes.length > 0 && (nextPageUrl || previousPageUrl)" class="pagination-controls">
+        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl" class="btn nav">
+            &lt;
+        </button>
+
+        <span class="page-info">
+            {{ getPaginationRange() }} de {{ totalLikes }}
+        </span>
+
+        <button (click)="goToNextPage()" [disabled]="!nextPageUrl" class="btn nav">
+            &gt;
+        </button>
+    </div>
+</div>

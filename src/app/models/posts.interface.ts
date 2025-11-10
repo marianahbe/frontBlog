@@ -12,32 +12,23 @@ export interface PostsModel {
     excerpt: string;
     timestamp: string;
 
-    likes_count: number; 
-    comments_count: number;
-
-    likers: LikeItem[]; 
-
-    likersNextUrl: string | null;
-    likersPreviousUrl: string | null;
-    
-    showLikers?: boolean;
-    showCommenters?: boolean;
-
     author_access: 'Read & Edit';
     team_access: AccessPermission;
     authenticated_access: AccessPermission;
     public_access: 'Read Only' | 'None';
 }
 
-export interface LikeItem {
+export interface LikesModel {
     id: number;
     user_id: number;
     post: number;
     username: string; 
 }
 
-export interface CommentItem {
+export interface CommentsModel {
     id: number;
+    user_id: number;
+    post: number;
     username: string;
     content: string;
     timestamp: string;
@@ -51,5 +42,10 @@ export interface PaginatedResponse<T> {
 }
 
 export type PostsResponse = PaginatedResponse<PostsModel>;
-export type LikesResponse = PaginatedResponse<LikeItem>;
-export type CommentsResponse = PaginatedResponse<CommentItem>;
+export type LikesResponse = PaginatedResponse<LikesModel>;
+export type CommentsResponse = PaginatedResponse<CommentsModel>;
+
+export interface LikeToggleResponse {
+    liked: boolean;
+    detail: string;
+}

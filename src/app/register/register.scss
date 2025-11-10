@@ -10,6 +10,7 @@ body {
     align-items: center;       // Centrar el hijo verticalmente 
     min-height: 100vh;         // El contenedor ocupa al menos toda la altura de la vista
     margin: 0;                 // Eliminar los márgenes predeterminados del body 
+    background: linear-gradient(to right, rgba(0, 57, 216, 0.3), rgba(1, 249, 183, 0.3));
 }
 
 // Caja que envuelve el formulario
@@ -25,6 +26,9 @@ body {
 
     // Centrar el contenido
     text-align: center; 
+
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
     
     // Estilos para los botones Registrar y Cancelar
 
@@ -47,6 +51,11 @@ body {
         display: flex;
         gap: 16px; // Espacio entre los botones
     }
+}
+
+.register-container:hover {
+    transform: scale(1.02); 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 

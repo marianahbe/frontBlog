@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LikesResponse} from '../models/posts.interface';
+import { LikesResponse, LikeToggleResponse} from '../models/posts.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,10 @@ export class LikesService {
     return this.http.get<LikesResponse>(url);
   }
   
-  onLike(postId: number): Observable<LikesResponse> {
+  toggleLike(postId: number): Observable<LikeToggleResponse> {
     const url = `${this.UrlLikes}${postId}/like/`;
-    return this.http.post<LikesResponse>(url, {});
+    return this.http.post<LikeToggleResponse>(url, {});
   }
+
+
 }

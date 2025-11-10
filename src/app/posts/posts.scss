@@ -1,0 +1,206 @@
+.card-header-v2 {
+    display: flex; // Habilita Flexbox
+    align-items: baseline; // Alinea todos los elementos por su línea de base de texto
+    margin-bottom: 10px;
+    
+    .post-title {
+        // Estilo del título: lo hace grande y lo mantiene a la izquierda
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #007bff; // Manteniendo un color de tu estilo original
+        margin-right: 15px;
+    }
+
+    .post-tag {
+        // Etiqueta "Beta Team": posicionada después del título
+        background-color: #f0f0f0; 
+        color: #333;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 500;
+        margin-right: 15px;
+        white-space: nowrap; 
+    }
+
+    .post-meta {
+        // Autor y Fecha/Hora: empujados completamente a la derecha
+        font-size: 0.9em;
+        color: #888;
+        margin-left: auto; 
+    }
+}
+
+.posts-list-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.loading-message {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+    font-style: italic;
+}
+
+/* Tarjeta de Post: Crucial para posicionar el popup */
+.post-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    position: relative; /* ANCLAJE: Necesario para posicionar el popup de forma absoluta */
+}
+
+.card-header h3 {
+    margin-top: 0;
+    color: #007bff;
+    font-size: 1.5em;
+}
+
+.card-body p {
+    color: #555;
+    line-height: 1.6;
+    margin: 15px 0;
+}
+
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.footer-stat strong {
+    color: #333;
+    font-size: 1.1em;
+    margin-right: 4px;
+}
+
+/* Contenedor de Likes: Necesario para anidar el popup */
+.likes-container {
+    cursor: pointer;
+    position: relative; /* ANCLAJE: Alternativo para posicionar el popup dentro del footer */
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.likes-container:hover {
+    background-color: #f5f5f5;
+}
+
+/* Estilos del Popup de Usuarios (LA SOLUCIÓN PRINCIPAL) */
+.users-list-popup {
+    position: absolute; /* POSICIÓN: Flotará sobre otros elementos */
+    bottom: 100%; /* Coloca el popup justo encima del elemento padre */
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px); /* Centra y sube ligeramente */
+    background-color: #333;
+    color: #fff;
+    border-radius: 6px;
+    padding: 10px 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10; /* PRIORIDAD: Asegura que esté por encima de todo */
+    min-width: 150px;
+    white-space: nowrap;
+}
+
+.users-list-popup ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.users-list-popup li {
+    padding: 2px 0;
+    font-size: 0.9em;
+}
+
+/* Flecha del Popup (Opcional, para mejor diseño) */
+.popup-arrow {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background-color: #333;
+}
+
+.post-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.btn-like {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+    padding: 0;
+}
+
+.btn-like:hover {
+    color: #ff4500;
+}
+
+.btn-like.liked {
+    color: #ff4500; /* Color rojo para "Me gusta" */
+}
+
+.btn-comment {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+    padding: 0;
+}
+
+.btn-comment:hover {
+    color: #007bff;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.pagination-controls .btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pagination-controls .btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+

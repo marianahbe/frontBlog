@@ -14,11 +14,11 @@ export class AuthService {
   private loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public isLoggedIn: Observable<boolean> = this.loggedIn.asObservable();
 
-  private userSource: BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
-  public currentUser: Observable<any | null> = this.userSource.asObservable();
+  private userSource$: BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
+  public user$: Observable<any | null> = this.userSource$.asObservable();
 
   constructor(private http: HttpClient){
-    this.userSource.next(this.getUserInfo());
+    this.userSource$.next(this.getUserInfo());
   }
 
   registerUser(userData: UserRegister): Observable<any>{
@@ -35,7 +35,7 @@ export class AuthService {
         console.log('ID del Equipo:', response.user_data.team_id);
       
         this.loggedIn.next(true);
-      this.userSource.next(response.user_data);
+      this.userSource$.next(response.user_data);
       }),
     );
   }
@@ -48,12 +48,11 @@ export class AuthService {
     )
   }
 
-
   clearLocal(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user_data');
     this.loggedIn.next(false);
-    this.userSource.next(null);
+    this.userSource$.next(null);
   }
 
   private getUserInfo(): any | null {
@@ -67,4 +66,5 @@ export class AuthService {
     }
     return null; 
   }
+
 }

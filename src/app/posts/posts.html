@@ -5,10 +5,12 @@
     <h2>Últimas Publicaciones</h2>
 
     <div *ngIf="posts.length === 0" class="loading-message">
-        Cargando publicaciones... o no hay publicaciones disponibles
+        <mat-spinner></mat-spinner>
     </div>
 
     <div *ngFor="let post of posts" class="post-card">
+        <app-likes [postId]="post.id" style="display: none;"></app-likes>
+        <app-comments [postId]="post.id" style="display: none;"></app-comments>
 
         <div class="card-header">
             <h3>{{ post.title }}</h3>
@@ -19,20 +21,18 @@
         </div>
 
         <div class="card-footer">
-            <span class="footer-stat likes-container" (mouseenter)="showLikers(post)" (mouseleave)="hideLikers(post)">
-                <strong>{{ post.likes_count }}</strong>
-                {{ post.likes_count === 1 ? 'Like' : 'Likes' }}
-                <div *ngIf="post.showLikers && post.likers.length > 0" class="users-list-popup">
+            <span class="footer-stat likes-container" (click)="toggleLikers(post)" style="cursor: pointer;">
+                <strong>{{ getLikeCount(post.id) }}</strong>
+                {{ getLikeCount(post.id) === 1 ? 'Like' : 'Likes' }}
+                <div *ngIf="post.showLikers && getLikeCount(post.id) > 0" class="users-list-popup">
                     <div class="popup-arrow"></div>
-                    <ul>
-                        <li *ngFor="let liker of post.likers">{{ liker }}</li>
-                    </ul>
+                    <app-likes [postId]="post.id"></app-likes>
                 </div>
             </span>
 
             <span class="footer-stat comments">
-                <strong>{{ post.comments_count }}</strong>
-                {{ post.comments_count === 1 ? 'Comentario' : 'Comentarios' }}
+                <strong>{{ getCommentCount(post.id) }}</strong>
+                {{ getCommentCount(post.id) === 1 ? 'Comentario' : 'Comentarios' }}
             </span>
 
             <span class="author">
@@ -49,20 +49,15 @@
         </div>
         <div class="post-actions">
 
-            <ng-container *ngIf="isUserAuthenticated$">
-                <button (click)="onLike(post)" class="btn btn-like" type="button">
-                    <mat-icon>favorite</mat-icon>
-                </button>
+            <ng-container *ngIf="isUserAuthenticated$ | async">
+                <button (click)="onLike(post)" class="btn btn-like" [ngClass]="{'liked': isLikedByCurrentUser(post)}" type="button">
+                    <mat-icon>{{ isLikedByCurrentUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
+               </button>
 
                 <button (click)="goToPostDetail(post)" class="btn btn-comment" type="button">
                     <mat-icon>comment</mat-icon>
                 </button>
             </ng-container>
-
-            <p *ngIf="!isUserAuthenticated$" class="auth-message">
-                Debes <a routerLink="/login">iniciar sesión</a> para interactuar.
-            </p>
-
         </div>
     </div>
 

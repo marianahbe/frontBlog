@@ -20,7 +20,7 @@ export class Header implements OnInit {
 
   ngOnInit(): void {
     this.isLoggedIn$ = this.authService.isLoggedIn;
-    this.currentUser$ = this.authService.currentUser;
+    this.currentUser$ = this.authService.user$;
   }
 
   logout(): void {
