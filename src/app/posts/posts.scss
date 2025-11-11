@@ -1,13 +1,13 @@
 .card-header {
     display: flex; // Habilita Flexbox
-    align-items: baseline; // Alinea todos los elementos por su línea de base de texto
+    align-items: baseline; // Alinea los elementos por su línea de base de texto
     gap: 15px;
     
     .post-title {
-        // Estilo del título: lo hace grande y lo mantiene a la izquierda
+        // Grande y a la izquierda
         font-size: 1.8em;
         font-weight: bold;
-        color: #007bff; // Manteniendo un color de tu estilo original
+        color: #007bff;
         margin: 0;
     }
 
@@ -23,7 +23,6 @@
     }
 
     .post-tag {
-        // Etiqueta "Beta Team": posicionada después del título
         background-color: #f0f0f0; 
         color: #333;
         padding: 2px 8px;
@@ -35,7 +34,7 @@
     }
 
     .post-meta {
-        // Autor y Fecha/Hora: empujados completamente a la derecha
+        // Autor y Fecha/Hora empujados a la derecha
         font-size: 0.9em;
         color: #888;
         margin-left: auto; 
@@ -71,7 +70,7 @@ h2 {
     flex-direction: column;
 }
 
-/* Tarjeta de Post: Crucial para posicionar el popup */
+// Tarjeta de Post
 .post-card {
     background-color: #fff;
     border: 1px solid #ddd;
@@ -79,11 +78,11 @@ h2 {
     margin-bottom: 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     padding: 20px;
-    position: relative; /* ANCLAJE: Necesario para posicionar el popup de forma absoluta */
+    position: relative; 
 }
 
 .read-more-link {
-    color: #0055b0; /* Color de enlace */
+    color: #0055b0; 
     text-decoration: none;
     font-weight: bold;
     margin-left: 5px;
@@ -114,7 +113,7 @@ h2 {
 
 .footer-stats {
     display: flex;
-    gap: 20px; /* Espacio entre los contadores (Likes y Comentarios) */
+    gap: 20px; // Espacio entre Likes y Comentarios
     align-items: center;
 }
 
@@ -124,10 +123,10 @@ h2 {
     margin-right: 4px;
 }
 
-/* Contenedor de Likes: Necesario para anidar el popup */
+// Contenedor de likes
 .likes-container {
     cursor: pointer;
-    position: relative; /* ANCLAJE: Alternativo para posicionar el popup dentro del footer */
+    position: relative; 
     padding: 5px;
     border-radius: 4px;
     transition: background-color 0.2s;
@@ -137,18 +136,17 @@ h2 {
     background-color: #f5f5f5;
 }
 
-/* Estilos del Popup de Usuarios (LA SOLUCIÓN PRINCIPAL) */
 .users-list-popup {
-    position: absolute; /* POSICIÓN: Flotará sobre otros elementos */
-    bottom: 100%; /* Coloca el popup justo encima del elemento padre */
+    position: absolute; 
+    bottom: 100%; 
     left: 50%;
-    transform: translateX(-50%) translateY(-10px); /* Centra y sube ligeramente */
+    transform: translateX(-50%) translateY(-10px); 
     background-color: #333;
     color: #fff;
     border-radius: 6px;
     padding: 10px 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 10; /* PRIORIDAD: Asegura que esté por encima de todo */
+    z-index: 10; 
     min-width: 150px;
     white-space: nowrap;
 }
@@ -164,7 +162,6 @@ h2 {
     font-size: 0.9em;
 }
 
-/* Flecha del Popup (Opcional, para mejor diseño) */
 .popup-arrow {
     position: absolute;
     bottom: -5px;
@@ -195,7 +192,7 @@ h2 {
 }
 
 .btn-like.liked {
-    color: #ff4500; /* Color rojo para "Me gusta" */
+    color: #ff4500; // Rojo para me gusta
 }
 
 .btn-comment, .btn-edit, .btn-delete {

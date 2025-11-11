@@ -4,6 +4,8 @@ import { CommentsService } from '../services/comments.service';
 import { CommentsModel, CommentsResponse } from '../models/posts.interface';
 import { PaginationService, COMMENTS_PER_PAGE } from '../services/pagination.service'
 import { GlobalCountService } from '../services/global';
+import { AuthService } from '../services/auth';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-comments',
@@ -24,7 +26,11 @@ export class Comments {
   pageSize: number = COMMENTS_PER_PAGE;
   currentPage: number = 1;
 
+  newCommentText: string = ''; 
+  isUserAuthenticated$!: Observable<boolean>;
+
   private postStatsService = inject(GlobalCountService);
+  private authService = inject(AuthService);
 
   constructor(
     private commentsService: CommentsService,
@@ -53,6 +59,23 @@ export class Comments {
       },
       error: (err) => {
         console.error('Error al cargar los comments:', err);
+      }
+    });
+  }
+
+  submitComment(): void {
+    const trimmedText = this.newCommentText.trim();
+    if (!trimmedText) {
+      return;
+    }
+
+    this.commentsService.createComment(this.postId, trimmedText).subscribe({
+      next: () => {
+        this.newCommentText = ''; 
+        this.loadComments(); 
+      },
+      error: (err) => {
+        console.error('Error al enviar el comentario:', err);
       }
     });
   }

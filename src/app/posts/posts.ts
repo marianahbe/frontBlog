@@ -105,7 +105,7 @@ export class Posts implements OnInit {
           isLiked: false,
           comment_count: 0, // Inicializado a 0 ya que no viene del modelo PostsModel
         })) as CompletePostsModel[];
-        /* Metadatos de la paginación */
+        // Metadatos de la paginación
         this.totalPosts = response.count;
         this.nextPageUrl = response.next;
         this.previousPageUrl = response.previous;
