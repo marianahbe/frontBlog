@@ -43,7 +43,7 @@ export class Posts implements OnInit {
   isUserAuthenticated$!: Observable<boolean>;
   private currentUsername: string | null = null;
   private currentUserId: number | null = null; 
-  private currentUserTeamId: number | null = null;
+  private currentUserTeam: string | null = null;
   private currentUserRole: 'ADMIN' | 'BLOGGER' | null = null;
 
   private postStatsService = inject(GlobalCountService);
@@ -64,7 +64,7 @@ export class Posts implements OnInit {
     this.authService.user$.subscribe(user => {
       this.currentUsername = user?.username || null;
       this.currentUserId = user?.id || null; 
-      this.currentUserTeamId = user?.team_id || null; 
+      this.currentUserTeam = user?.team_id || null;
       this.currentUserRole = user?.role || null;
       this.posts.forEach(post => this.fetchAndUpdateLikes(post.id, true));
     });
@@ -208,7 +208,12 @@ export class Posts implements OnInit {
     if (post.authenticated_access === AccessPermission.READ_AND_EDIT) {
         return true;
     }
-  return false;
+    const isTeamAccessEnabled = post.team_access === AccessPermission.READ_AND_EDIT;
+    const isSameTeam = this.currentUserTeam !== null && post.author_team !== undefined && this.currentUserTeam === post.author_team;
+    if (isTeamAccessEnabled && isSameTeam) {
+        return true;
+    }
+    return false;
   }
 
   onDelete(post: PostsModel): void {

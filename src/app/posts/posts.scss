@@ -1,14 +1,25 @@
-.card-header-v2 {
+.card-header {
     display: flex; // Habilita Flexbox
     align-items: baseline; // Alinea todos los elementos por su línea de base de texto
-    margin-bottom: 10px;
+    gap: 15px;
     
     .post-title {
         // Estilo del título: lo hace grande y lo mantiene a la izquierda
         font-size: 1.8em;
         font-weight: bold;
         color: #007bff; // Manteniendo un color de tu estilo original
-        margin-right: 15px;
+        margin: 0;
+    }
+
+    .team-meta,
+    .author-meta,
+    .timestamp {
+        font-size: 0.9em;
+        color: #888;
+        white-space: nowrap; // Evita saltos de línea
+    }
+    .team-meta { 
+        margin-left: auto;
     }
 
     .post-tag {
@@ -36,6 +47,8 @@
     margin: 20px auto;
     padding: 20px;
     font-family: Arial, sans-serif;
+    // background: linear-gradient(to right, rgba(0, 57, 216, 0.3), rgba(1, 249, 183, 0.3));
+    // border-radius: 8px;
 }
 
 h2 {
@@ -51,6 +64,11 @@ h2 {
     padding: 30px;
     color: #777;
     font-style: italic;
+
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    flex-direction: column;
 }
 
 /* Tarjeta de Post: Crucial para posicionar el popup */
@@ -64,6 +82,14 @@ h2 {
     position: relative; /* ANCLAJE: Necesario para posicionar el popup de forma absoluta */
 }
 
+.read-more-link {
+    color: #0055b0; /* Color de enlace */
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 5px;
+    text-decoration: underline;
+}
+
 .card-header h3 {
     margin-top: 0;
     color: #007bff;
@@ -71,7 +97,7 @@ h2 {
 }
 
 .card-body p {
-    color: #555;
+    color: #2a2a2a;
     line-height: 1.6;
     margin: 15px 0;
 }
@@ -84,6 +110,12 @@ h2 {
     border-top: 1px solid #eee;
     font-size: 0.9em;
     color: #888;
+}
+
+.footer-stats {
+    display: flex;
+    gap: 20px; /* Espacio entre los contadores (Likes y Comentarios) */
+    align-items: center;
 }
 
 .footer-stat strong {
@@ -146,9 +178,7 @@ h2 {
 .post-actions {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
+    align-items: center;
 }
 
 .btn-like {
