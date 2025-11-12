@@ -19,11 +19,25 @@ export interface PostsModel {
     public_access: 'Read Only' | 'None';
 }
 
+export interface PostRequestBody {
+    title: string;
+    content: string;
+    author_access: 'Read & Edit';
+    team_access: AccessPermission;
+    authenticated_access: AccessPermission;
+    public_access: 'Read Only' | 'None';
+}
+
 export interface LikesModel {
     id: number;
     user_id: number;
     post: number;
     username: string; 
+}
+
+export interface LikeToggleResponse {
+    liked: boolean;
+    detail: string;
 }
 
 export interface CommentsModel {
@@ -45,8 +59,3 @@ export interface PaginatedResponse<T> {
 export type PostsResponse = PaginatedResponse<PostsModel>;
 export type LikesResponse = PaginatedResponse<LikesModel>;
 export type CommentsResponse = PaginatedResponse<CommentsModel>;
-
-export interface LikeToggleResponse {
-    liked: boolean;
-    detail: string;
-}

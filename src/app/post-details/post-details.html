@@ -1,0 +1,47 @@
+<app-header></app-header>
+
+<main class="post-detail-main">
+
+    <div *ngIf="isLoading" class="loading-message">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <article *ngIf="post && !isLoading" class="post-article">
+
+            <button (click)="goToPosts()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>  
+            </button>
+                <span (click)="goToPosts()" class="back-link">Volver a Posts</span>
+        <header class="post-header">
+            <h1 class="post-title">{{ post.title }}</h1>
+            <p class="post-meta-info">
+                Publicado por <span class="post-author">{{ post.author }}</span>
+                el {{ post.timestamp | date:'longDate' }}
+            </p>
+        </header>
+
+        <section class="post-content">
+            {{ post.content }}
+        </section>
+
+        <footer class="post-footer">
+
+            <div class="interaction-counters">
+                <span class="like-count">
+                    {{ getLikeCount() }} Likes
+                </span>
+            </div>
+        </footer>
+
+        <section class="comments-section">
+            <h2 class="comments-title">Comentarios</h2>
+            <app-comments *ngIf="post.id" [postId]="post.id"></app-comments>
+        </section>
+
+    </article>
+
+    <div *ngIf="!post && !isLoading" class="not-found-message">
+        <h2 class="not-found-title">Post no encontrado</h2>
+        <p class="not-found-text">Lo sentimos, la publicación que buscas no existe o ha sido eliminada.</p>
+    </div>
+</main>

@@ -18,6 +18,10 @@ export class AuthService {
   public user$: Observable<any | null> = this.userSource$.asObservable();
 
   constructor(private http: HttpClient){
+    const userInfo = this.getUserInfo();
+    const tokenExists = localStorage.getItem('token') !== null;
+    this.loggedIn = new BehaviorSubject<boolean>(tokenExists && userInfo !== null); 
+    this.isLoggedIn = this.loggedIn.asObservable();
     this.userSource$.next(this.getUserInfo());
   }
 

@@ -1,0 +1,61 @@
+<div class="comments-loading-indicator" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+</div>
+
+<div class="comments-container" *ngIf="!isLoading">
+
+    <div class="comments-empty" *ngIf="comments.length === 0">
+        Aún no hay comentarios. ¡Sé el primero en comentar!
+    </div>
+
+    <div class="comment-list">
+        <div class="comment-item" *ngFor="let comment of comments">
+            <div class="comment-header">
+                <span class="comment-username">{{ comment.username }}</span>
+                <span class="comment-timestamp">{{ comment.timestamp | date:'short' }}</span>
+            </div>
+            <p class="comment-content">{{ comment.content }}</p>
+            <button (click)="deleteComment(comment.id)" class="btn btn-delete" type="button" title="Eliminar">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <div class="comments-pagination" *ngIf="totalComments > 5">
+        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl || isLoading" aria-label="Página Anterior">
+            &lt;
+        </button>
+
+        <span class="pagination-info">
+            {{ getPaginationRange() }}
+        </span>
+
+        <button (click)="goToNextPage()" [disabled]="!nextPageUrl || isLoading" aria-label="Página Siguiente">
+            &gt;
+        </button>
+    </div>
+</div>
+
+<div class="auth-message-warning" *ngIf="!(isUserAuthenticated$ | async)">
+    Debes <a [routerLink]="['/login']">iniciar sesión</a> para publicar comentarios.
+</div>
+
+
+<div class="new-comment-form-wrapper" *ngIf="isUserAuthenticated$ | async">
+    <h3>Añade un nuevo comentario</h3>
+    <form (ngSubmit)="submitComment()">
+        <textarea [(ngModel)]="newCommentContent" name="newCommentContent" rows="3"
+            placeholder="Escribe tu comentario aquí..." [disabled]="isSubmittingComment"
+            class="new-comment-textarea"></textarea>
+        <div class="new-comment-actions">
+            <button type="submit" [disabled]="!newCommentContent.trim() || isSubmittingComment"
+                class="new-comment-submit-button">
+                <mat-spinner diameter="20" *ngIf="isSubmittingComment"></mat-spinner>
+                <span *ngIf="!isSubmittingComment">Enviar</span>
+            </button>
+            <button type="button" (click)="cancelCommentCreation()" [disabled]="isSubmittingComment || !newCommentContent.trim()" class="btn btn-cancel-comment">
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>

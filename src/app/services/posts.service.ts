@@ -7,13 +7,13 @@ import { PostsResponse, PostsModel, LikesResponse, CommentsResponse } from '../m
   providedIn: 'root'
 })
 export class PostsService {
-  private apiUrl = 'https://blogproject-hu3j.onrender.com/posts/';
+  private Url = 'https://blogproject-hu3j.onrender.com/posts/';
   private UrlLyC = 'https://blogproject-hu3j.onrender.com/post/';
 
   constructor(private http: HttpClient) { }
 
   getPosts(url?: string): Observable<PostsResponse> {
-    const fetchUrl = url || this.apiUrl;
+    const fetchUrl = url || this.Url;
     return this.http.get<PostsResponse>(fetchUrl);
   }
 
@@ -26,16 +26,16 @@ export class PostsService {
   }
 
   getLikers(url?: string): Observable<LikesResponse> {
-    const fetchUrl = url || this.apiUrl;
+    const fetchUrl = url || this.Url;
     return this.http.get<LikesResponse>(fetchUrl);
   }
 
   getCommenters(url?: string): Observable<CommentsResponse> {
-    const fetchUrl = url || this.apiUrl;
+    const fetchUrl = url || this.Url;
     return this.http.get<CommentsResponse>(fetchUrl);
   }
 
   deletePost(postId: number): Observable<any> {
-    return this.http.post<any>(`${this.UrlLyC}${postId}/delete/`, {});
+    return this.http.delete<any>(`${this.UrlLyC}${postId}/delete/`, {});
   }
 }

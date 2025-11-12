@@ -6,11 +6,16 @@ import { PaginationService, COMMENTS_PER_PAGE } from '../services/pagination.ser
 import { GlobalCountService } from '../services/global';
 import { AuthService } from '../services/auth';
 import { Observable } from 'rxjs';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { PostsModel } from '../models/posts.interface';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-comments',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, MatProgressSpinner, RouterLink, MatIconModule],
   templateUrl: './comments.html',
   styleUrl: './comments.scss',
 })
@@ -26,7 +31,9 @@ export class Comments {
   pageSize: number = COMMENTS_PER_PAGE;
   currentPage: number = 1;
 
-  newCommentText: string = ''; 
+  newCommentContent: string = ''; 
+  isLoading: boolean = false;
+  isSubmittingComment: boolean = false;
   isUserAuthenticated$!: Observable<boolean>;
 
   private postStatsService = inject(GlobalCountService);
@@ -41,9 +48,12 @@ export class Comments {
     if (this.postId) {
       this.loadComments();
     }
+    this.isUserAuthenticated$ = this.authService.isLoggedIn;
   }
 
   loadComments(url?: string): void {
+    if (!this.postId) return;
+    this.isLoading = true;
     this.currentPage = this.paginationService.getCurrentPageNumber(url || null);
     this.commentsService.getCommentsForPost(this.postId, url).subscribe({
       next: (response: CommentsResponse) => {
@@ -53,7 +63,7 @@ export class Comments {
         this.totalComments = response.count;
         this.nextPageUrl = response.next;
         this.previousPageUrl = response.previous;
-        
+        this.isLoading = false;
         this.postStatsService.updateCommentCount(this.postId, response.count);
         console.log('Posts Cargados:', this.comments);
       },
@@ -64,20 +74,27 @@ export class Comments {
   }
 
   submitComment(): void {
-    const trimmedText = this.newCommentText.trim();
-    if (!trimmedText) {
+    const text = this.newCommentContent.trim();
+    if (!text) {
       return;
     }
-
-    this.commentsService.createComment(this.postId, trimmedText).subscribe({
+    this.isSubmittingComment = true;
+    this.commentsService.createComment(this.postId, text).subscribe({
       next: () => {
-        this.newCommentText = ''; 
+        this.newCommentContent = ''; 
         this.loadComments(); 
+        this.isSubmittingComment = false;
       },
       error: (err) => {
         console.error('Error al enviar el comentario:', err);
+        this.isSubmittingComment = false;
       }
     });
+  }
+
+  cancelCommentCreation(): void {
+    this.newCommentContent = ''; 
+    this.isSubmittingComment = false;
   }
 
   getPaginationRange(): string{
@@ -100,4 +117,17 @@ export class Comments {
     }
   }
 
+  deleteComment(commentId: number): void {
+    if (confirm(`¿Seguro de que quieres eliminar el comentario?`)) {          
+        this.commentsService.deleteComment(commentId).subscribe({
+            next: () => {
+                console.log('Comentario eliminado con éxito.');
+                this.loadComments(this.currentPageUrl); 
+            },
+            error: (err) => {
+                console.error('Error al eliminar el comentario:', err);
+            }
+        });
+    }
+  }
 }

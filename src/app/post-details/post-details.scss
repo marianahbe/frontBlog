@@ -1,0 +1,11 @@
+.loading-message {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+    font-style: italic;
+
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    flex-direction: column;
+}
