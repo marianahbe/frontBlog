@@ -11,8 +11,6 @@ const PERMISSION_LEVELS: { [key: string]: number } = {
   'None': 0
 };
 
-const PERMISSION_HIERARCHY = ['Read & Edit', 'Read Only', 'None'];
-
 function permissionHierarchyValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const teamAccess = control.get('team_access')?.value as AccessPermission;
@@ -40,13 +38,17 @@ function permissionHierarchyValidator(): ValidatorFn {
     return null;
   };
 }
+export class PostEdit {
+
+}
+
 
 @Component({
   selector: 'app-post-create',
   standalone: true,
   imports: [ ReactiveFormsModule, CommonModule, Header],
-  templateUrl: './post-create.html',
-  styleUrl: './post-create.scss',
+  templateUrl: './post-edit.html',
+  styleUrl: './post-edit.scss',
 })
 export class PostCreate {
 

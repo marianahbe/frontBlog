@@ -24,7 +24,10 @@ export class Header implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe();
+    if (confirm("¿Seguro de que quieres cerrar tu sesión?")) { 
+      this.authService.logout().subscribe();
+      alert("Sesión cerrada con éxito")
+    }
   }
 
 }
