@@ -11,7 +11,9 @@
             <button (click)="goToPosts()" class="back-button">
                 <mat-icon>arrow_back</mat-icon>  
             </button>
-                <span (click)="goToPosts()" class="back-link">Volver a Posts</span>
+            <button *ngIf="canEdit" (click)="goToEditPost()" class="btn btn-edit">
+                <mat-icon>edit</mat-icon> 
+            </button>
         <header class="post-header">
             <h1 class="post-title">{{ post.title }}</h1>
             <p class="post-meta-info">
@@ -21,7 +23,7 @@
         </header>
 
         <section class="post-content">
-            {{ post.content }}
+            <div [innerHtml]="getSafeHtml(post.content)"></div>
         </section>
 
         <footer class="post-footer">
@@ -42,6 +44,6 @@
 
     <div *ngIf="!post && !isLoading" class="not-found-message">
         <h2 class="not-found-title">Post no encontrado</h2>
-        <p class="not-found-text">Lo sentimos, la publicación que buscas no existe o ha sido eliminada.</p>
+        <p class="not-found-text">Lo sentimos, la publicación que buscas no existe o ha sido eliminada</p>
     </div>
 </main>

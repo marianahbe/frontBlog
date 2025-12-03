@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CommentsResponse, CommentsModel } from '../models/posts.interface';
+import { map } from 'rxjs';
 
 @Injectable({ 
   providedIn: 'root'
@@ -16,8 +17,15 @@ export class CommentsService {
     return this.http.get<CommentsResponse>(url);
   }
 
+  getCommentCountForPost(postId: number): Observable<number> {
+    const url = `${this.Url}${postId}/comments/`;
+    return this.http.get<CommentsResponse>(`${url}?page_size=1`).pipe(
+      map(response => response.count) 
+    );
+  }
+
   createComment(postId: number,content: string): Observable<CommentsModel>{
-    const url = `${this.Url}comment/${postId}`;
+    const url = `${this.Url}comment/${postId}/`;
     return this.http.post<CommentsModel>(url, { content: content })
   }
 

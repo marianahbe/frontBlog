@@ -1,9 +1,26 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+/*
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, rgba(0, 57, 216, 0.1), rgba(1, 249, 183, 0.1));
+}
+*/
+
 .card-header {
     display: flex; // Habilita Flexbox
+    flex-wrap: wrap;
     align-items: baseline; // Alinea los elementos por su línea de base de texto
-    gap: 15px;
+    gap: 15px 10px;
     
     .post-title {
+        flex-basis: 100%;
+        flex-shrink: 0;
         // Grande y a la izquierda
         font-size: 1.8em;
         font-weight: bold;
@@ -16,28 +33,9 @@
     .timestamp {
         font-size: 0.9em;
         color: #888;
-        white-space: nowrap; // Evita saltos de línea
     }
     .team-meta { 
         margin-left: auto;
-    }
-
-    .post-tag {
-        background-color: #f0f0f0; 
-        color: #333;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 0.8em;
-        font-weight: 500;
-        margin-right: 15px;
-        white-space: nowrap; 
-    }
-
-    .post-meta {
-        // Autor y Fecha/Hora empujados a la derecha
-        font-size: 0.9em;
-        color: #888;
-        margin-left: auto; 
     }
 }
 
@@ -85,8 +83,9 @@ h2 {
     color: #0055b0; 
     text-decoration: none;
     font-weight: bold;
-    margin-left: 5px;
+    margin-left: 0;
     text-decoration: underline;
+    cursor: pointer;
 }
 
 .card-header h3 {
@@ -95,10 +94,39 @@ h2 {
     font-size: 1.5em;
 }
 
-.card-body p {
-    color: #2a2a2a;
-    line-height: 1.6;
-    margin: 15px 0;
+.card-body {
+    display: block;
+    padding: 0 0 1rem 0;
+    .excerpt-content {
+        display: inline;
+        word-break: break-all;
+        overflow-wrap: break-word;
+
+        ::ng-deep > * {
+            display: inline !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            margin-right: 5px !important;
+        }
+    }
+}
+
+.card-body .excerpt-content {
+    display: inline;
+}
+
+.excerpt-content p {
+    display: inline !important; 
+    margin: 0 !important; 
+    padding: 0 !important;
+    line-height: inherit;
+    vertical-align: baseline; 
+}
+
+.card-body .read-more-link {
+    white-space: nowrap; 
+    display: inline;
+    margin-left: 5px;
 }
 
 .card-footer {
@@ -115,6 +143,7 @@ h2 {
     display: flex;
     gap: 20px; // Espacio entre Likes y Comentarios
     align-items: center;
+    cursor: pointer;
 }
 
 .footer-stat strong {
@@ -125,7 +154,6 @@ h2 {
 
 // Contenedor de likes
 .likes-container {
-    cursor: pointer;
     position: relative; 
     padding: 5px;
     border-radius: 4px;
@@ -151,17 +179,6 @@ h2 {
     white-space: nowrap;
 }
 
-.users-list-popup ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.users-list-popup li {
-    padding: 2px 0;
-    font-size: 0.9em;
-}
-
 .popup-arrow {
     position: absolute;
     bottom: -5px;
@@ -181,10 +198,10 @@ h2 {
 .btn-like {
     background: none;
     border: none;
-    cursor: pointer;
     color: #888;
     transition: color 0.2s;
     padding: 0;
+    cursor: pointer;
 }
 
 .btn-like:hover {
@@ -198,13 +215,13 @@ h2 {
 .btn-comment, .btn-edit, .btn-delete {
     background: none;
     border: none;
-    cursor: pointer;
     color: #888;
     transition: color 0.2s;
     padding: 0;
+    cursor: pointer;
 }
 
-.btn-comment:hover .btn-edit:hover .btn-comment:delete{
+.btn-comment:hover .btn-edit:hover .btn-delete:hover{
     color: #007bff;
 }
 
@@ -222,12 +239,68 @@ h2 {
     border: none;
     padding: 8px 15px;
     border-radius: 4px;
-    cursor: pointer;
     transition: background-color 0.2s;
+    cursor: pointer;
 }
 
 .pagination-controls .btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+.create-post {
+    position: fixed;
+    bottom: 30px; // 30px desde el borde inferior
+    right: 30px; // 30px desde el borde derecho
+    z-index: 1000; // Asegura que esté por encima de otros elementos
+
+    // Estilo visual atractivo para un botón de acción
+    background-color: #007bff; // Azul primario
+    color: white;
+    border: none;
+    border-radius: 50%; // Circular
+    width: 56px; // Tamaño estándar de FAB
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25); // Sombra para efecto 3D/flotante
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    font-size: 0;
+}
+
+.create-post:hover {
+    background-color: #0055b0; // Oscurecer al pasar el ratón
+    transform: scale(1.05); // Efecto de ligero crecimiento
+}
+
+@media (max-width: 600px) {
+    .card-header {
+        flex-direction: column; 
+        align-items: flex-start; 
+        gap: 5px;
+
+        .post-title {
+            flex-basis: auto; 
+            margin-bottom: 5px;
+            font-size: 1.5em;
+        }
+
+        .team-meta, .author-meta, .timestamp, .post-tag{
+            margin-left: 0; 
+            width: 100%; 
+            display: block;
+        }
+        
+        .post-tag {
+            order: -1; 
+            margin-bottom: 5px;
+        }
+
+        .post-meta {
+            order: 1; 
+        }
+    }
 }
 

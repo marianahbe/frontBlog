@@ -20,6 +20,4 @@ export class LikesService {
     const url = `${this.UrlLikes}${postId}/like/`;
     return this.http.post<LikeToggleResponse>(url, {});
   }
-
-
 }

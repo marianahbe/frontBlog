@@ -4,14 +4,12 @@
             <img src="/images/Logo-AvanzaTech-Grad-B.svg" alt="Logo avanzatech">
         </a>
     </div>
-
     <nav>
         <ul>
             <ng-container *ngIf="!(isLoggedIn$ | async)">
                 <li>
                     <a [routerLink]="['/login']">Ingresar</a>
                 </li>
-
                 <li>
                     <a [routerLink]="['/register']">Registrarse</a>
                 </li>
@@ -26,7 +24,7 @@
                     <a (click)="logout()">Cerrar Sesión</a>
                 </li>
                 <li *ngIf="isLoggedIn$ | async">
-                    <button (click)="logout()" class="btn btn-logout" type="button">
+                    <button (click)="logout()" class="btn-logout" type="button">
                         <mat-icon>logout</mat-icon>
                     </button>
                 </li>

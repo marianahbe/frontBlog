@@ -4,6 +4,7 @@ import { LikesResponse, LikesModel } from '../models/posts.interface';
 import { PaginationService, LIKES_PER_PAGE } from '../services/pagination.service';
 import { LikesService } from '../services/likes.service';
 import { GlobalCountService } from '../services/global';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-likes',
@@ -31,7 +32,8 @@ export class Likes {
 
   constructor(
     private likesService: LikesService,
-    private paginationService: PaginationService
+    private paginationService: PaginationService,
+    private snackBar: MatSnackBar
   ){ }
 
   ngOnInit(): void {
@@ -53,10 +55,12 @@ export class Likes {
         this.nextPageUrl = response.next;
         this.previousPageUrl = response.previous;
         this.postCountService.updateLikeCount(this.postId, response.count);
-        console.log('Posts Cargados:', this.likes);
       },
       error: (err: any) => {
-        console.error('Error al cargar los likes:', err);
+        this.snackBar.open('Error al cargar los likes', '', {
+          duration: 4000,
+        });
+      this.isLoadingLikers = false;
       }
     });
   }

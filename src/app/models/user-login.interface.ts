@@ -1,7 +1,6 @@
 export interface UserLogin{
     email: string;
     password: string;
-    passwordConf: string;
 }
 
 export interface UserData {

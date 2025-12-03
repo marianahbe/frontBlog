@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, HostListener, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PostsModel, PostsResponse, LikesResponse, LikeToggleResponse, AccessPermission } from '../models/posts.interface';
 import { PostsService } from '../services/posts.service';
@@ -9,23 +9,30 @@ import { Observable } from 'rxjs';
 import { Header } from '../header/header';
 import { PaginationService, POSTS_PER_PAGE } from '../services/pagination.service';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { take, tap } from 'rxjs/operators';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { Likes } from '../likes/likes';
 import { Comments } from '../comments/comments';
 import { GlobalCountService } from '../services/global';
 import { LikesService } from '../services/likes.service';
+import { CommentsService } from '../services/comments.service';
+
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ViewChildren, QueryList } from '@angular/core';
 
 interface CompletePostsModel extends PostsModel {
   showLikers: boolean;
   isLiked: boolean;
   likers: { username: string }[];
   comment_count: number;
+  isTruncated: boolean;
 }
 
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [CommonModule, MatIconModule, Header, Likes, Comments, MatProgressSpinner],
+  imports: [CommonModule, MatIconModule, Header, Likes, MatProgressSpinner, MatSnackBarModule],
   templateUrl: './posts.html',
   styleUrl: './posts.scss',
 })
@@ -48,6 +55,11 @@ export class Posts implements OnInit {
 
   private postStatsService = inject(GlobalCountService);
   private likeService = inject(LikesService);
+  private commentsService = inject(CommentsService);
+  private sanitizer = inject(DomSanitizer);
+  private snackBar = inject(MatSnackBar);
+
+  @ViewChildren(Comments) commentComponents!: QueryList<Comments>;
 
   constructor(
     private postsService: PostsService,
@@ -58,15 +70,23 @@ export class Posts implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadPosts();
     this.isUserAuthenticated$ = this.authService.isLoggedIn;
 
-    this.authService.user$.subscribe(user => {
-      this.currentUsername = user?.username || null;
-      this.currentUserId = user?.id || null; 
-      this.currentUserTeam = user?.team_id || null;
-      this.currentUserRole = user?.role || null;
-      this.posts.forEach(post => this.fetchAndUpdateLikes(post.id, true));
+    this.authService.user$.pipe(
+        tap(user => {
+            this.currentUsername = user?.username || null;
+            this.currentUserId = user?.id || null;
+            this.currentUserTeam = user?.team_name || null;
+            this.currentUserRole = user?.role || null;
+        }),
+        take(1) 
+    ).subscribe({
+        next: () => {
+          this.loadPosts(); 
+        },
+        error: (err) => {
+            this.loadPosts(); 
+        }
     });
   }
 
@@ -90,7 +110,9 @@ export class Posts implements OnInit {
         }
       },
       error: (err) => {
-        console.error(`Error al obtener/recargar likes para post ${postId}:`, err);
+        this.snackBar.open('Error al cargar los likes del post', '', {
+          duration: 4000,
+        });
       }
     })
   }
@@ -100,10 +122,11 @@ export class Posts implements OnInit {
     this.postsService.getPosts(url).subscribe({
       next: (response: PostsResponse) => {
         this.posts = response.results.map((post: PostsModel) => ({
-          ...post, // Copia las propiedades del objeto post para luego sobreescribir si se muestran o no
+          ...post, 
           showLikers: false,
           isLiked: false,
-          comment_count: 0, // Inicializado a 0 ya que no viene del modelo PostsModel
+          comment_count: 0, 
+          isTruncated: this.checkIfTruncated(post.content, post.excerpt) 
         })) as CompletePostsModel[];
         // Metadatos de la paginación
         this.totalPosts = response.count;
@@ -111,18 +134,24 @@ export class Posts implements OnInit {
         this.previousPageUrl = response.previous;
 
         this.posts.forEach(post => {
-          this.postStatsService.updateCommentCount(post.id, post.comment_count ?? 0);
           this.fetchAndUpdateLikes(post.id, false)
+          this.commentsService.getCommentCountForPost(post.id).subscribe({
+            next: (count) => {
+              this.postStatsService.updateCommentCount(post.id, count);
+            }
+          });
         });
       },
       error: (err) => {
-        console.error('Error al cargar los posts:', err);
+        this.snackBar.open('Error al cargar los posts, inténtalo de nuevo', '', {
+            duration: 4000,
+        });
       }
     });
   }
 
   getLikeCount(postId: number): number {
-    // Lee el valor actual de la Signal y busca el conteo por ID
+    // Lee el valor actual de la Signal y busca el conteo por id
     return this.postStatsService.postStats().get(postId)?.likeCount || 0;
   }
 
@@ -131,7 +160,7 @@ export class Posts implements OnInit {
   }
 
   goToPostDetail(post: PostsModel): void {
-    this.router.navigate(['/post', post.id]);
+    this.router.navigate(['/posts', post.id]);
   }
 
   getPaginationRange(): string {
@@ -152,6 +181,10 @@ export class Posts implements OnInit {
     if (this.previousPageUrl) {
       this.loadPosts(this.previousPageUrl)
     }
+  }
+
+  createPost(): void {
+    this.router.navigate(['/posts/create']);
   }
 
   toggleLikers(post: CompletePostsModel): void {
@@ -181,21 +214,34 @@ export class Posts implements OnInit {
 
   onLike(post: PostsModel): void {
     if (!this.currentUsername) {
-      console.log('Usuario no autenticado o username desconocido.');
+      this.snackBar.open('Debes iniciar sesión para dar Me gusta', '', {
+        duration: 4000,
+      });
       return;
     }
     const postId = post.id;
     this.likeService.toggleLike(postId).subscribe({
       next: (response: LikeToggleResponse) => {
         this.fetchAndUpdateLikes(postId);
+        const message = response.liked ? 'Me gusta añadido' : 'Me gusta eliminado';
+        this.snackBar.open(message, '', {
+          duration: 4000,
+        });
       },
       error: (err) => {
-        console.error(`Error al alternar like del post ${postId}:`, err);
+        this.snackBar.open('No se pudo actualizar el estado de Me gusta', '', {
+          duration: 4000,
+        });
       }
     });
   }
 
   canEditOrDelete(post: PostsModel): boolean {
+    console.log(post.team_access);
+    console.log(this.currentUserTeam);
+    console.log(post.author_team);
+    console.log(this.currentUserRole);
+
     if (this.currentUsername === null || this.currentUserId === null) {
         return false;
     }
@@ -205,10 +251,10 @@ export class Posts implements OnInit {
     if (this.currentUserRole === 'ADMIN') {
         return true; 
     }
-    if (post.authenticated_access === AccessPermission.READ_AND_EDIT) {
+    if (post.authenticated_access === AccessPermission.READ_AND_WRITE) {
         return true;
     }
-    const isTeamAccessEnabled = post.team_access === AccessPermission.READ_AND_EDIT;
+    const isTeamAccessEnabled = post.team_access === AccessPermission.READ_AND_WRITE;
     const isSameTeam = this.currentUserTeam !== null && post.author_team !== undefined && this.currentUserTeam === post.author_team;
     if (isTeamAccessEnabled && isSameTeam) {
         return true;
@@ -218,17 +264,23 @@ export class Posts implements OnInit {
 
   onDelete(post: PostsModel): void {
       if (!this.canEditOrDelete(post)) {
-          console.warn('Acceso denegado.');
-          return;
+        this.snackBar.open('Acceso denegado', '', {
+          duration: 4000,
+        });
+        return;
       }
-      if (confirm(`¿Seguro de que quieres eliminar la publicación "${post.title}"?`)) {          
+      if (confirm(`¿Seguro de que quieres eliminar la publicación "${post.title}"?`)) {
           this.postsService.deletePost(post.id).subscribe({
               next: () => {
-                  console.log('Post eliminado con éxito.');
+                  this.snackBar.open('Publicación eliminada con éxito', '', {
+                    duration: 4000,
+                  });
                   this.loadPosts(this.currentPageUrl); 
               },
               error: (err) => {
-                  console.error('Error al eliminar el post:', err);
+                  this.snackBar.open('Error al eliminar la publicación, inténtalo de nuevo', '', {
+                    duration: 4000,
+                  });
               }
           });
       }
@@ -237,11 +289,42 @@ export class Posts implements OnInit {
   @HostListener('document:click', ['$event'])
   handleClick(event: Event) {
     const clickedInside = this.elementRef.nativeElement.contains(event.target);
-
     const clickedOnLikersButton = (event.target as HTMLElement).closest('.likes-container');
-
     if (!clickedOnLikersButton) {
       this.closeAllLikers();
     }
+  }
+  
+  public getSafeHtml(html: string | undefined): SafeHtml {
+    if (!html) return '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private checkIfTruncated(content: string, excerpt: string): boolean {
+    if (!content || !excerpt) return false;
+    const contentLength = this.getPlainTextLength(content);
+    const excerptLength = this.getPlainTextLength(excerpt);
+    return contentLength > excerptLength + 5; 
+  }
+
+  private getPlainTextLength(html: string | undefined): number {
+    if (!html) return 0;
+    
+    // elemento temporal para parsear el HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+  
+    // texto plano
+    const plainText = tempDiv.textContent || '';
+    
+    // se borran los espacios en blanco del inicio y final
+    return plainText.trim().length;
+  }
+  isExcerptTruncated(post: PostsModel): boolean {
+    if (!post.content || !post.excerpt) return false;
+
+    const contentLength = this.getPlainTextLength(post.content);
+    const excerptLength = this.getPlainTextLength(post.excerpt);
+    return contentLength > excerptLength;
   }
 }

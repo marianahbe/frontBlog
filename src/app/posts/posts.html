@@ -1,91 +1,91 @@
 <app-header></app-header>
+<body>
+    <div class="posts-list-container">
 
-<div class="posts-list-container">
+        <h2>Últimas Publicaciones</h2>
 
-    <h2>Últimas Publicaciones</h2>
-
-    <div *ngIf="posts.length === 0" class="loading-message">
-        <mat-spinner></mat-spinner>
-    </div>
-
-    <div *ngFor="let post of posts" class="post-card">
-        <app-likes [postId]="post.id" style="display: none;"></app-likes>
-        <app-comments [postId]="post.id" style="display: none;"></app-comments>
-
-        <header class="card-header">
-            <h3 class="post-title">{{ post.title }}</h3> 
-            <span class="team-meta">
-                <strong>{{ post.author_team}}</strong>
-            </span>
-
-            <span class="author-meta">
-                Publicado por: <strong>{{ post.author }}</strong>
-            </span>
-
-            <span class="timestamp">
-                Fecha: {{ post.timestamp | date:'shortDate' }}
-            </span>
-        </header>
-
-        <div class="card-body">
-            <p>
-                {{ post.excerpt }}
-                <a (click)="goToPostDetail(post)" class="read-more-link" style="cursor: pointer;">
-                    Leer más
-                </a>
-            </p>
+        <div *ngIf="posts.length === 0" class="loading-message">
+            <mat-spinner></mat-spinner>
         </div>
 
-        <footer class="card-footer">
-            <div class="footer-stats"> 
-                <span class="footer-stat likes-container" (click)="toggleLikers(post)" style="cursor: pointer;">
-                    <strong>{{ getLikeCount(post.id) }}</strong>
-                    {{ getLikeCount(post.id) === 1 ? 'Like' : 'Likes' }}
-                    <div *ngIf="post.showLikers && getLikeCount(post.id) > 0" class="users-list-popup">
-                        <div class="popup-arrow"></div>
-                        <app-likes [postId]="post.id"></app-likes>
-                    </div>
+        <div *ngFor="let post of posts" class="post-card">
+
+            <header class="card-header">
+                <h3 class="post-title">{{ post.title }}</h3> 
+                <span class="team-meta">
+                    <strong>{{ post.author_team}}</strong>
                 </span>
 
-                <span class="footer-stat comments">
-                    <strong>{{ getCommentCount(post.id) }}</strong>
-                    {{ getCommentCount(post.id) === 1 ? 'Comentario' : 'Comentarios' }}
+                <span class="author-meta">
+                    Publicado por: <strong>{{ post.author }}</strong>
                 </span>
-            </div>
 
-            <div class="post-actions">
-                <ng-container *ngIf="isUserAuthenticated$ | async">
-                    <button (click)="onLike(post)" class="btn btn-like" [ngClass]="{'liked': isLikedByCurrentUser(post)}" type="button">
-                        <mat-icon>{{ isLikedByCurrentUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
-                    </button>
+                <span class="timestamp">
+                    Fecha: {{ post.timestamp | date:'shortDate' }}
+                </span>
+            </header>
 
-                    <button (click)="goToPostDetail(post)" class="btn btn-comment" type="button">
-                        <mat-icon>comment</mat-icon>
-                    </button>
-                </ng-container>
-                <ng-container *ngIf="(isUserAuthenticated$ | async) && canEditOrDelete(post)">
-                    <button (click)="goToPostDetail(post)" class="btn btn-edit" type="button" title="Editar">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-
-                    <button (click)="onDelete(post)" class="btn btn-delete" type="button" title="Eliminar">
-                        <mat-icon>delete</mat-icon>
-                    </button>
+            <div class="card-body">
+                <span [innerHtml]="getSafeHtml(post.excerpt)" class="excerpt-content"></span>
+                <ng-container *ngIf="post.isTruncated">
+                    <a (click)="goToPostDetail(post)" class="read-more-link">Leer más</a>
                 </ng-container>
             </div>
-        </footer>
-    </div>
-    <div *ngIf="posts.length > 0" class="pagination-controls">
-        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl" class="btn nav">
-            &lt;
-        </button>
+            
+            <footer class="card-footer">
+                <div class="footer-stats"> 
+                    <span class="footer-stat likes-container" (click)="toggleLikers(post)">
+                        <strong>{{ getLikeCount(post.id) }}</strong>
+                        {{ getLikeCount(post.id) === 1 ? 'Like' : 'Likes' }}
+                        <div *ngIf="post.showLikers && getLikeCount(post.id) > 0" class="users-list-popup">
+                            <div class="popup-arrow"></div>
+                            <app-likes [postId]="post.id"></app-likes>
+                        </div>
+                    </span>
 
-        <span class="page-info">
-            {{ getPaginationRange() }}
-        </span>
+                    <span class="footer-stat comments" (click)="goToPostDetail(post)">
+                        <strong>{{ getCommentCount(post.id) }}</strong>
+                        {{ getCommentCount(post.id) === 1 ? 'Comentario' : 'Comentarios' }}
+                    </span>
+                </div>
 
-        <button (click)="goToNextPage()" [disabled]="!nextPageUrl" class="btn nav">
-            &gt;
-        </button>
+                <div class="post-actions">
+                    <ng-container *ngIf="isUserAuthenticated$ | async">
+                        <button (click)="onLike(post)" class="btn btn-like" [ngClass]="{'liked': isLikedByCurrentUser(post)}" type="button">
+                            <mat-icon>{{ isLikedByCurrentUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
+                        </button>
+
+                        <button (click)="goToPostDetail(post)" class="btn btn-comment" type="button">
+                            <mat-icon>comment</mat-icon>
+                        </button>
+                    </ng-container>
+                    <ng-container *ngIf="(isUserAuthenticated$ | async) && canEditOrDelete(post)">
+                        <button (click)="goToPostDetail(post)" class="btn btn-edit" type="button" title="Editar">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+
+                        <button (click)="onDelete(post)" class="btn btn-delete" type="button" title="Eliminar">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </ng-container>
+                </div>
+            </footer>
+        </div>
+        <div *ngIf="posts.length > 0" class="pagination-controls">
+            <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl" class="btn nav">
+                &lt;
+            </button>
+
+            <span class="page-info">
+                {{ getPaginationRange() }}
+            </span>
+
+            <button (click)="goToNextPage()" [disabled]="!nextPageUrl" class="btn nav">
+                &gt;
+            </button>
+        </div>
+            <button *ngIf="isUserAuthenticated$ | async" (click)="createPost()" class="create-post" type="button" title="Crear Post">
+                <mat-icon>add circle</mat-icon>
+            </button>
     </div>
-    </div>
+</body>

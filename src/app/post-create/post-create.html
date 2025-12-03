@@ -1,126 +1,106 @@
 <app-header></app-header>
 
-<div class="post-creator-wrapper">
-<div class="post-creator-card">
-    <h1 class="post-creator-title">
-        Crear Nuevo Post
-    </h1>
+<main class="post-detail-main">
+    
+    <div class="post-article">
+        
+        <button (click)="goToPosts()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        
+        <header class="post-header">
+            Crear Nuevo Post
+        </header>
 
-    <!-- Formulario Reactivo -->
-    <form [formGroup]="postForm" (ngSubmit)="onCreatePost()">
+        <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
 
-        <!-- Título y Contenido -->
-        <div class="form-fields-container">
-            <!-- Campo Título -->
-            <div class="form-group">
-                <label for="title" class="form-label">
-                    Título <span class="required-indicator">*</span>
-                </label>
-                <input id="title" type="text" formControlName="title" placeholder="Escribe un título atractivo..."
-                    class="form-input" [ngClass]="{'input-error': isFieldInvalid('title')}">
-                @if (isFieldInvalid('title')) {
-                <p class="validation-error-message">El título es obligatorio.</p>
-                }
+            <div class="form-fields-container">
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Título <span class="required-indicator">*</span>
+                    </label>
+                    <input id="title" type="text" formControlName="title" placeholder="Escribe un título..."
+                        class="form-input" [ngClass]="{'input-error': isFieldInvalid('title')}">
+                    @if (isFieldInvalid('title')) {
+                    <p class="validation-error-message">El título es obligatorio.</p>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        Contenido <span class="required-indicator">*</span>
+                    </label>
+                    
+                    <editor
+                        id="content"
+                        formControlName="content" 
+                        [apiKey]="'4a9iuf5xmatm89rhxm8qt2l9tc9sxk5mbt84fu05efx2weim'" [init]="{
+                            height: 400,
+                            menubar: true,
+                            plugins: [
+                                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+                                'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                            ],
+                            toolbar:
+                                'undo redo | formatselect | bold italic backcolor | \
+                                alignleft aligncenter alignright alignjustify | \
+                                bullist numlist outdent indent | removeformat | help'
+                        }"
+                    ></editor>
+                    @if (isFieldInvalid('content')) {
+                    <p class="validation-error-message">El contenido es obligatorio.</p>
+                    }
+                </div>
             </div>
 
-            <!-- Campo Contenido -->
-            <div class="form-group">
-                <label for="content" class="form-label">
-                    Contenido <span class="required-indicator">*</span>
-                </label>
-                <textarea id="content" formControlName="content" rows="8"
-                    placeholder="Empieza a redactar el contenido de tu post aquí..." class="form-input form-textarea"
-                    [ngClass]="{'input-error': isFieldInvalid('content')}"></textarea>
-                @if (isFieldInvalid('content')) {
-                <p class="validation-error-message">El contenido es obligatorio.</p>
-                }
-            </div>
-        </div>
+            <h2 class="section-header">Control de Acceso</h2>
 
-        <h2 class="section-header">Control de Acceso</h2>
+            <div class="access-controls-container">
 
-        <!-- Permisos de Acceso -->
-        <div class="access-controls-container">
+                <div class="form-group access-control-item">
+                    <label for="team_access" class="form-label">Acceso del Equipo</label>
+                    <select id="team_access" formControlName="team_access" class="form-select">
+                        <option *ngFor="let option of teamOptions" [ngValue]="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
 
-            <!-- Permiso de Equipo -->
-            <div class="form-group">
-                <label for="team_access" class="form-label">Acceso del Equipo</label>
-                <select id="team_access" formControlName="team_access" class="form-select"
-                    [ngClass]="{'select-error': isHierarchyError() && postForm.hasError('teamAccessHierarchy')}">
-                    <option *ngFor="let option of teamOptions" [ngValue]="option.value">{{ option.label }}</option>
-                </select>
-            </div>
+                <div class="form-group access-control-item">
+                    <label for="authenticated_access" class="form-label">Acceso de Autenticados</label>
+                    <select id="authenticated_access" formControlName="authenticated_access" class="form-select">
+                        <option *ngFor="let option of authenticatedOptions" [ngValue]="option.value">{{ option.label }}
+                        </option>
+                    </select>
+                </div>
 
-            <!-- Permiso de Usuarios Autenticados -->
-            <div class="form-group">
-                <label for="authenticated_access" class="form-label">Acceso de Autenticados</label>
-                <select id="authenticated_access" formControlName="authenticated_access" class="form-select"
-                    [ngClass]="{'select-error': isHierarchyError() && postForm.hasError('authenticatedAccessHierarchy')}">
-                    <option *ngFor="let option of authenticatedOptions" [ngValue]="option.value">{{ option.label }}
-                    </option>
-                </select>
+                <div class="form-group access-control-item">
+                    <label for="public_access" class="form-label">Acceso Público</label>
+                    <select id="public_access" formControlName="public_access" class="form-select">
+                        <option *ngFor="let option of publicOptions" [ngValue]="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Permiso Público -->
-            <div class="form-group">
-                <label for="public_access" class="form-label">Acceso Público</label>
-                <select id="public_access" formControlName="public_access" class="form-select">
-                    <option *ngFor="let option of publicOptions" [ngValue]="option.value">{{ option.label }}</option>
-                </select>
+            <div class="row-buttons">
+                <button type="button" (click)="onCancel()" [disabled]="isLoading()" class="btn-primary">
+                    Cancelar
+                </button>
+
+                <button type="submit" [disabled]="postForm.invalid || isLoading()"
+                    class="btn-primary color-btn">
+                    @if (isLoading()) {
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle class="path" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="segment" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    Enviando...
+                    } @else {
+                    Crear Post
+                    }
+                </button>
             </div>
-        </div>
-
-        <!-- Errores de Jerarquía de Permisos -->
-        @if (isHierarchyError()) {
-        <div class="warning-box">
-            <p class="warning-box-title">Advertencia de Permisos</p>
-            @if (postForm.hasError('teamAccessHierarchy')) {
-            <p class="warning-box-text">⚠️ El acceso del equipo (superior) no puede ser menor que el acceso de usuarios
-                autenticados (inferior).</p>
-            }
-            @if (postForm.hasError('authenticatedAccessHierarchy')) {
-            <p class="warning-box-text">⚠️ El acceso de usuarios autenticados (superior) no puede ser menor que el
-                acceso público (inferior).</p>
-            }
-        </div>
-        }
-
-        <!-- Estado de la Operación (Errores de envío) -->
-        @if (errorMessage()) {
-        <div class="error-box">
-            <p class="error-box-title">Error al Enviar</p>
-            <p>{{ errorMessage() }}</p>
-        </div>
-        }
-
-        @if (successMessage()) {
-        <div class="success-box">
-            <p class="success-box-title">¡Éxito!</p>
-            <p>{{ successMessage() }}</p>
-        </div>
-        }
-
-        <!-- Botones de Acción -->
-        <div class="form-actions">
-            <button type="button" (click)="onCancel()" [disabled]="isLoading()" class="btn btn-secondary">
-                Cancelar
-            </button>
-
-            <button type="submit" [disabled]="postForm.invalid || isLoading() || isHierarchyError()"
-                class="btn btn-primary">
-                @if (isLoading()) {
-                <svg class="spinner" viewBox="0 0 24 24">
-                    <circle class="path" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="segment" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                    </path>
-                </svg>
-                Enviando...
-                } @else {
-                Crear Post
-                }
-            </button>
-        </div>
-    </form>
-</div>
-</div>
+        </form>
+    </div>
+</main>

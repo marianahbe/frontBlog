@@ -1,5 +1,5 @@
 export enum AccessPermission {
-    READ_AND_EDIT = 'Read & Edit',
+    READ_AND_WRITE = 'Read & Write',
     READ_ONLY = 'Read Only',
     NONE = 'None'
 }
@@ -13,7 +13,7 @@ export interface PostsModel {
     excerpt: string;
     timestamp: string;
 
-    author_access: 'Read & Edit';
+    author_access: 'Read & Write';
     team_access: AccessPermission;
     authenticated_access: AccessPermission;
     public_access: 'Read Only' | 'None';
@@ -22,7 +22,8 @@ export interface PostsModel {
 export interface PostRequestBody {
     title: string;
     content: string;
-    author_access: 'Read & Edit';
+    excerpt?: string;
+    author_access: 'Read & Write';
     team_access: AccessPermission;
     authenticated_access: AccessPermission;
     public_access: 'Read Only' | 'None';

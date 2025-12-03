@@ -5,24 +5,31 @@
 <div class="comments-container" *ngIf="!isLoading">
 
     <div class="comments-empty" *ngIf="comments.length === 0">
-        Aún no hay comentarios. ¡Sé el primero en comentar!
+        Aún no hay comentarios, ¡escribe el primero!
     </div>
 
-    <div class="comment-list">
-        <div class="comment-item" *ngFor="let comment of comments">
-            <div class="comment-header">
-                <span class="comment-username">{{ comment.username }}</span>
+    <div *ngFor="let comment of comments" class="comment-item" [class.comment-highlight]="comment.id === highlightedCommentId">
+    
+        <header class="comment-header">
+            <span class="comment-author">{{ comment.username }}</span>
+
+            <div class="comment-meta">
                 <span class="comment-timestamp">{{ comment.timestamp | date:'short' }}</span>
+                
+                <button *ngIf="isUserAuthenticated$ | async"
+                    (click)="deleteComment(comment.id)" class="btn-delete" type="button" title="Eliminar comentario" >
+                    <mat-icon class="icon-small">delete_outline</mat-icon>
+                </button>
             </div>
-            <p class="comment-content">{{ comment.content }}</p>
-            <button (click)="deleteComment(comment.id)" class="btn btn-delete" type="button" title="Eliminar">
-                <mat-icon>close</mat-icon>
-            </button>
-        </div>
-    </div>
+        </header>
 
-    <div class="comments-pagination" *ngIf="totalComments > 5">
-        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl || isLoading" aria-label="Página Anterior">
+    <div class="comment-content">
+        <p>{{ comment.content }}</p>
+    </div>
+</div>
+
+    <div class="pagination-controls" *ngIf="totalComments > 5">
+        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl || isLoading" aria-label="Página Anterior" class="btn nav">
             &lt;
         </button>
 
@@ -30,7 +37,7 @@
             {{ getPaginationRange() }}
         </span>
 
-        <button (click)="goToNextPage()" [disabled]="!nextPageUrl || isLoading" aria-label="Página Siguiente">
+        <button (click)="goToNextPage()" [disabled]="!nextPageUrl || isLoading" aria-label="Página Siguiente" class="btn nav">
             &gt;
         </button>
     </div>
@@ -44,17 +51,17 @@
 <div class="new-comment-form-wrapper" *ngIf="isUserAuthenticated$ | async">
     <h3>Añade un nuevo comentario</h3>
     <form (ngSubmit)="submitComment()">
-        <textarea [(ngModel)]="newCommentContent" name="newCommentContent" rows="3"
+        <textarea [(ngModel)]="newCommentContent" name="newCommentContent" rows="4"
             placeholder="Escribe tu comentario aquí..." [disabled]="isSubmittingComment"
             class="new-comment-textarea"></textarea>
-        <div class="new-comment-actions">
+        <div class="row-buttons">
+            <button type="button" (click)="cancelCommentCreation()" [disabled]="isSubmittingComment || !newCommentContent.trim()" class="btn-primary">
+                Cancelar
+            </button>
             <button type="submit" [disabled]="!newCommentContent.trim() || isSubmittingComment"
-                class="new-comment-submit-button">
+                class="btn-primary color-btn">
                 <mat-spinner diameter="20" *ngIf="isSubmittingComment"></mat-spinner>
                 <span *ngIf="!isSubmittingComment">Enviar</span>
-            </button>
-            <button type="button" (click)="cancelCommentCreation()" [disabled]="isSubmittingComment || !newCommentContent.trim()" class="btn btn-cancel-comment">
-                Cancelar
             </button>
         </div>
     </form>

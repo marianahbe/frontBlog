@@ -5,6 +5,8 @@ import { UserRegister } from '../models/user-register.interface';
 import { UserLogin, AuthResponse } from '../models/user-login.interface';
 import { tap } from 'rxjs';
 
+import { Router } from '@angular/router';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,9 +17,12 @@ export class AuthService {
   public isLoggedIn: Observable<boolean> = this.loggedIn.asObservable();
 
   private userSource$: BehaviorSubject<any | null> = new BehaviorSubject<any | null>(null);
-  public user$: Observable<any | null> = this.userSource$.asObservable();
+  public user$: Observable<any | null> = this.userSource$.asObservable();
 
-  constructor(private http: HttpClient){
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ){
     const userInfo = this.getUserInfo();
     const tokenExists = localStorage.getItem('token') !== null;
     this.loggedIn = new BehaviorSubject<boolean>(tokenExists && userInfo !== null); 
@@ -34,10 +39,7 @@ export class AuthService {
       tap(response => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user_data', JSON.stringify(response.user_data));
-      
-        console.log('Rol del usuario:', response.user_data.role);
-        console.log('ID del Equipo:', response.user_data.team_id);
-      
+
         this.loggedIn.next(true);
       this.userSource$.next(response.user_data);
       }),
@@ -57,6 +59,8 @@ export class AuthService {
     localStorage.removeItem('user_data');
     this.loggedIn.next(false);
     this.userSource$.next(null);
+
+    this.router.navigate(['/']);
   }
 
   private getUserInfo(): any | null {

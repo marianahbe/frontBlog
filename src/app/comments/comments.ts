@@ -11,11 +11,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PostsModel } from '../models/posts.interface';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Notificaciones
 
 @Component({
   selector: 'app-comments',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatProgressSpinner, RouterLink, MatIconModule],
+  imports: [CommonModule, FormsModule, MatProgressSpinner, RouterLink, MatIconModule, MatSnackBarModule],
   templateUrl: './comments.html',
   styleUrl: './comments.scss',
 })
@@ -33,25 +34,29 @@ export class Comments {
 
   newCommentContent: string = ''; 
   isLoading: boolean = false;
+  hasLoaded: boolean = false;
   isSubmittingComment: boolean = false;
   isUserAuthenticated$!: Observable<boolean>;
+
+  highlightedCommentId: number | null = null;
 
   private postStatsService = inject(GlobalCountService);
   private authService = inject(AuthService);
 
   constructor(
     private commentsService: CommentsService,
-    private paginationService: PaginationService
+    private paginationService: PaginationService,
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit(): void {
-    if (this.postId) {
+    this.isUserAuthenticated$ = this.authService.isLoggedIn;
+    if (!this.hasLoaded) { 
       this.loadComments();
     }
-    this.isUserAuthenticated$ = this.authService.isLoggedIn;
   }
 
-  loadComments(url?: string): void {
+  public loadComments(url?: string): void {
     if (!this.postId) return;
     this.isLoading = true;
     this.currentPage = this.paginationService.getCurrentPageNumber(url || null);
@@ -64,11 +69,14 @@ export class Comments {
         this.nextPageUrl = response.next;
         this.previousPageUrl = response.previous;
         this.isLoading = false;
+        this.hasLoaded = true;
         this.postStatsService.updateCommentCount(this.postId, response.count);
-        console.log('Posts Cargados:', this.comments);
       },
       error: (err) => {
-        console.error('Error al cargar los comments:', err);
+        this.snackBar.open('Error al cargar los comentarios', '', {
+          duration: 4000,
+        });
+        this.isLoading = false;
       }
     });
   }
@@ -80,13 +88,20 @@ export class Comments {
     }
     this.isSubmittingComment = true;
     this.commentsService.createComment(this.postId, text).subscribe({
-      next: () => {
+      next: (newComment: CommentsModel) => {
         this.newCommentContent = ''; 
+        this.highlightedCommentId = newComment.id;
         this.loadComments(); 
         this.isSubmittingComment = false;
+
+        setTimeout(() => {
+            this.highlightedCommentId = null;
+        }, 2000); 
       },
       error: (err) => {
-        console.error('Error al enviar el comentario:', err);
+        this.snackBar.open('Error al enviar el comentario, por favor inténtalo de nuevo', '', {
+          duration: 5000,
+        });
         this.isSubmittingComment = false;
       }
     });
@@ -118,16 +133,18 @@ export class Comments {
   }
 
   deleteComment(commentId: number): void {
-    if (confirm(`¿Seguro de que quieres eliminar el comentario?`)) {          
-        this.commentsService.deleteComment(commentId).subscribe({
-            next: () => {
-                console.log('Comentario eliminado con éxito.');
-                this.loadComments(this.currentPageUrl); 
-            },
-            error: (err) => {
-                console.error('Error al eliminar el comentario:', err);
-            }
+    this.commentsService.deleteComment(commentId).subscribe({
+      next: () => {
+        this.snackBar.open('Comentario eliminado con éxito', '', {
+          duration: 4000,
         });
-    }
+          this.loadComments(this.currentPageUrl); 
+      },
+      error: (err) => {
+        this.snackBar.open('Error al eliminar el comentario, vuelve a intentarlo', '', {
+          duration: 4000,
+        });
+      }
+    });
   }
 }

@@ -19,7 +19,7 @@ body {
     padding: 2rem 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    max-width: 450px; // Ancho máximo del registro
+    max-width: 450px; // Ancho máximo del login
 
     width: 90%;
     margin: 1.5rem auto;
@@ -28,10 +28,6 @@ body {
     text-align: center; 
 
     transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-
-    h2 {
-        padding-bottom: 1rem;
-    }
     
     // Estilos para los botones Registrar y Cancelar
     form {
@@ -39,15 +35,42 @@ body {
         flex-direction: column;
         align-items: center;
 
-        .btn-primary {
-            width: 100%;
-            max-width: 250px; 
-            margin-top: 0.75rem;
-        }
     }
     .row-buttons {
         display: flex;
         gap: 16px; // Espacio entre los botones
+        
+        .btn-primary {
+            width: 100%;
+            max-width: 250px; 
+            margin-top: 0.75rem;
+            border-radius: 0.3rem;
+            text-align: center;
+            cursor: pointer;
+
+            background-color: #f3f4f6; 
+            color: #1f2937;
+            border: 1px solid #d1d5db;
+
+            transition: background-color 0.2s, border-color 0.2s, opacity 0.2s;
+        }
+        .btn-primary:hover:not(:disabled) {
+            transform: scale(1.02); 
+            background-color: #e5e7eb; 
+            border-color: #9ca3af;
+        }
+        
+        .color-btn {
+            background-color: rgba(1, 249, 183, 0.1); 
+            color: #1f2937; 
+            border-color: rgba(1, 249, 183, 0.5);
+        }
+        
+        .color-btn:hover:not(:disabled) {
+            background-color: rgba(1, 249, 183, 0.3); 
+            border-color: rgba(1, 249, 183, 0.7); 
+            transform: scale(1.02); 
+        }
     }
 }
 
@@ -67,12 +90,10 @@ body {
         font-weight: 600;
         margin-bottom: 0.5rem;
         text-align: left;
-        // En móvil, el text-align: center del .register-container lo centrará
-        // En desktop, el text-align: left del .register-container lo alineará
     }
 
     .alert {
-        color: #0038ee; // Color rojo para errores
+        color: #0038ee;
         font-size: 0.875rem;
         margin-top: 0.25rem;
         text-align: left;
@@ -93,13 +114,14 @@ body {
         padding: 0.75rem 2.5rem 0.75rem 0.75rem;
         border: 1px solid #d1d5db;
         border-radius: 0.5rem;
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
     }
     
     // Botón de toggle de visibilidad de contraseña
     .btn-toggle {
         position: absolute;
         right: 0rem;
-        top: 50%; // Ajusta para alinear con el input
+        top: 50%; // Para alinear con el input
         transform: translateY(-50%);
         height: auto;
         display: flex;
@@ -113,5 +135,11 @@ body {
         &:hover {
             text-decoration: underline;
         }
+    }
+
+    // cuando se muestra la alerta
+    .form-control.ng-invalid.ng-touched {
+        border-color: #0038ee;
+        box-shadow: 0 0 0 0.1rem rgba(0, 56, 238, 0.25);
     }
 }

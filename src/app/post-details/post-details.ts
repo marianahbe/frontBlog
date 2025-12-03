@@ -13,6 +13,9 @@ import { LikesService } from '../services/likes.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-post-details',
   imports: [CommonModule, Header, Comments, MatIconModule, MatProgressSpinnerModule],
@@ -35,6 +38,8 @@ export class PostDetails implements OnInit{
   private route = inject(ActivatedRoute);
   private postStatsService = inject(GlobalCountService);
   private likesService = inject(LikesService); 
+  private sanitizer = inject(DomSanitizer);
+  private snackBar = inject(MatSnackBar);
   
   constructor(
     private postsService: PostsService,
@@ -60,15 +65,18 @@ export class PostDetails implements OnInit{
         this.fetchAndUpdateLikesCount(post.id);
       },
       error: (err) => {
-        console.error('Error al cargar el detalle del post:', err);
+        this.snackBar.open('Error al cargar el detalle del post', '', {
+          duration: 4000,
+        });
         this.post = null;
         this.isLoading = false;
       }
     });
-    this.isUserAuthenticated$ = this.authService.isLoggedIn;
-        this.authService.user$.subscribe(user => {
+      this.isUserAuthenticated$ = this.authService.isLoggedIn;
+      this.authService.user$.subscribe(user => {
       this.currentUsername = user?.username || null;
       this.currentUserId = user?.id || null;
+      this.currentUserTeam = user?.team_name || null;
     });
 
   }
@@ -79,7 +87,9 @@ export class PostDetails implements OnInit{
         this.postStatsService.updateLikeCount(postId, likesResponse.count);
       },
       error: (err) => {
-        console.error(`Error al obtener/recargar conteo de likes para post ${postId}:`, err);
+        this.snackBar.open('Error al obtener los likes del post', '', {
+          duration: 4000,
+        });
       }
     });
   }
@@ -96,5 +106,42 @@ export class PostDetails implements OnInit{
 
   goToPosts(): void {
     this.router.navigate(['/posts']);
+  }
+
+  goToEditPost(): void {
+    if (this.postId) {
+      this.router.navigate(['/posts', this.postId, 'edit']);
+    }
+  }
+
+  get canEdit(): boolean {
+    console.log(this.currentUserTeam);
+    if (this.post === null || this.currentUsername === null || this.currentUserId === null) {
+        return false;
+    }
+    const post = this.post;
+    if (this.currentUsername === null || this.currentUserId === null) {
+        return false;
+    }
+    if (post.author === this.currentUsername) {
+        return true;
+    }
+    if (this.currentUserRole === 'ADMIN') {
+        return true; 
+    }
+    if (post.authenticated_access === 'Read & Write') {
+        return true;
+    }
+    const isTeamAccessEnabled = post.team_access === 'Read & Write';
+    const isSameTeam = this.currentUserTeam !== null && post.author_team !== undefined && this.currentUserTeam === post.author_team;
+    if (isTeamAccessEnabled && isSameTeam) {
+        return true;
+    }
+    return false;
+  }
+
+  public getSafeHtml(html: string | undefined): SafeHtml {
+    if (!html) return '';
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

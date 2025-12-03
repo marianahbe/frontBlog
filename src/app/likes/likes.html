@@ -10,7 +10,7 @@
     </div>
 
     <div *ngIf="likes.length > 0 && (nextPageUrl || previousPageUrl)" class="pagination-controls">
-        <button (click)="goToPreviousPage()" [disabled]="!previousPageUrl" class="btn nav">
+        <button (click)="goToPreviousPage(); $event.stopPropagation()" [disabled]="!previousPageUrl" class="btn nav">
             &lt;
         </button>
 
@@ -18,7 +18,7 @@
             {{ getPaginationRange() }} de {{ totalLikes }}
         </span>
 
-        <button (click)="goToNextPage()" [disabled]="!nextPageUrl" class="btn nav">
+        <button (click)="goToNextPage(); $event.stopPropagation()" [disabled]="!nextPageUrl" class="btn nav">
             &gt;
         </button>
     </div>

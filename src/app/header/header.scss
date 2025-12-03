@@ -1,61 +1,56 @@
-/* Estilos Base para la Cabecera */
 .app-header {
-    /* 1. Distribución y Alineación */
+    // Flexbox para alinear elementos
     display: flex;
-    justify-content: space-between; /* Mueve el logo a la izquierda y la navegación a la derecha */
-    align-items: center; /* Centra verticalmente todos los elementos (logo e ítems de nav) */
+    justify-content: space-between; 
+    align-items: center; 
     
-    /* 2. Apariencia */
-    background-color: #ffffff; /* Fondo blanco */
-    border-bottom: 1px solid #e0e0e0; /* Línea separadora sutil */
-    padding: 1rem 2rem; /* Espacio interno superior/inferior y a los lados */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra ligera */
+    background-color: #ffffff; 
+    border-bottom: 1px solid #e0e0e0; 
+    padding: 1rem 2rem; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
 }
 
-/* Estilos para el Logo */
+// Para el logo
 .app-header .logo a img {
-    /* Asegura que el logo tenga un tamaño razonable */
-    height: 40px; /* Altura estándar para logos en cabeceras */
+    height: 40px; 
     display: block;
 }
 
-/* Estilos para la Navegación */
 .app-header nav ul {
-    display: flex; /* Usamos Flexbox para alinear los ítems de la lista horizontalmente */
-    list-style: none; /* Eliminar los puntos de la lista */
+    display: flex; 
+    list-style: none; 
     margin: 0;
     padding: 0;
-    align-items: center; /* Centra verticalmente los ítems de la lista (texto, botones) */
+    align-items: center; 
 }
 
 .app-header nav ul li {
-    /* Espacio entre los ítems de la navegación */
+    // Espaciado para los items de nav
     margin-left: 1.5rem; 
     font-size: 1rem;
     color: #333333;
-    white-space: nowrap; /* Evita que el nombre de usuario se rompa */
+    white-space: nowrap; 
 }
 
-/* Estilos para los Enlaces y Botones */
 .app-header nav ul li a {
     text-decoration: none;
-    color: #007bff; /* Color primario para los enlaces */
+    color: #007bff; 
     font-weight: 500;
     transition: color 0.3s ease;
     cursor: pointer;
 }
 
 .app-header nav ul li a:hover {
-    color: #0056b3; /* Oscurece al pasar el ratón */
+    color: #0056b3; 
 }
 
-/* Estilo específico para el botón de Cerrar Sesión (con icono) */
+// Para el botón de cerrar sesión
 .app-header .btn-logout {
     background: none;
     border: none;
     padding: 0.5rem;
     cursor: pointer;
-    color: #777777; /* Color de icono más sutil */
+    color: #777777; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,11 +58,48 @@
 }
 
 .app-header .btn-logout:hover {
-    color: #cc0000; /* Color rojo para indicar acción de salida */
+    color: #0038ee; 
 }
 
-/* Estilos para el Nombre de Usuario */
 .app-header nav ul li:first-child[ng-reflect-ng-if]:not(:has(a)) {
     color: #333333;
     font-weight: 600;
+}
+
+// Media Query
+@media (max-width: 540px) {
+    // apilar
+    .app-header {
+        flex-wrap: wrap; 
+        padding: 1rem 1.5rem; 
+    }
+    
+    .app-header .logo {
+        flex-basis: 100%; // TODO el espacio
+        margin-bottom: 0.5rem; 
+        border-bottom: 1px solid #e0e0e0; 
+        padding-bottom: 1rem; 
+        margin-bottom: 0.3rem;
+    }
+    
+    .app-header nav {
+        flex-basis: 100%; // TODO el espacio
+    }
+
+    .app-header nav ul {
+        width: 100%; 
+        justify-content: space-evenly; 
+        padding: 0;
+        margin: 0;
+    }
+    
+    .app-header nav ul li {
+        margin: 0; 
+        white-space: nowrap;
+    }
+    
+    // Quita el margen izquierdo para el primer elemento
+    .app-header nav ul li:first-child {
+        margin-left: 0 !important; 
+    }
 }

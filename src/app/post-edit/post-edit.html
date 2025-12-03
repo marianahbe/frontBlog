@@ -1,1 +1,98 @@
 <app-header></app-header>
+
+<main class="post-detail-main">
+    
+    <div class="post-article">
+        
+        <button (click)="goToPosts()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        
+        <header class="post-header">
+            Editar Post #{{ postId() }}
+        </header>
+
+        <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+
+            <div class="form-fields-container">
+                <div class="form-group">
+                    <label for="title" class="form-label">
+                        Título <span class="required-indicator">*</span>
+                    </label>
+                    <input id="title" type="text" formControlName="title" placeholder="Escribe un título..."
+                        class="form-input" [ngClass]="{'input-error': isFieldInvalid('title')}">
+                    <ng-container *ngIf="isFieldInvalid('title')">
+                        <p class="validation-error-message">El título es obligatorio</p>
+                    </ng-container>
+                </div>
+
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        Contenido <span class="required-indicator">*</span>
+                    </label>
+                    
+                    <editor
+                        id="content"  
+                        formControlName="content" 
+                        [apiKey]="'4a9iuf5xmatm89rhxm8qt2l9tc9sxk5mbt84fu05efx2weim'" [init]="{
+                            height: 400,
+                            menubar: true,
+                            plugins: [
+                                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+                                'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                            ],
+                            toolbar:
+                                'undo redo | formatselect | bold italic backcolor | \
+                                alignleft aligncenter alignright alignjustify | \
+                                bullist numlist outdent indent | removeformat | help'
+                        }"
+                    ></editor>
+                    @if (isFieldInvalid('content')) {
+                    <p class="validation-error-message">El contenido es obligatorio</p>
+                    }
+                </div>
+            </div>
+
+            <h2 class="section-header">Control de Acceso</h2>
+
+            <div class="access-controls-container">
+                <div class="form-group access-control-item">
+                    <label for="team_access" class="form-label">Acceso del Equipo</label>
+                    <select id="team_access" formControlName="team_access" class="form-select">
+                        <option *ngFor="let option of teamOptions" [ngValue]="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group access-control-item">
+                    <label for="authenticated_access" class="form-label">Acceso de Autenticados</label>
+                    <select id="authenticated_access" formControlName="authenticated_access" class="form-select">
+                        <option *ngFor="let option of authenticatedOptions" [ngValue]="option.value">{{ option.label }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group access-control-item">
+                    <label for="public_access" class="form-label">Acceso Público</label>
+                    <select id="public_access" formControlName="public_access" class="form-select">
+                        <option *ngFor="let option of publicOptions" [ngValue]="option.value">{{ option.label }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row-buttons">
+                <button type="button" (click)="onCancel()" [disabled]="isLoading()" class="btn-primary">
+                    Cancelar
+                </button>
+
+                <button type="submit" [disabled]="postForm.invalid || isLoading()"
+                    class="btn-primary color-btn">
+                    <ng-container *ngIf="isLoading(); else updateText">
+                        Guardando...
+                    </ng-container>
+                    <ng-template #updateText> Actualizar Post </ng-template>
+                </button>
+            </div>
+        </form>
+    </div>
+</main>

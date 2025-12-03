@@ -20,7 +20,11 @@ export class PaginationService {
         const paramsString = url.includes('?') ? url.split('?')[1] : '';
         const urlParams = new URLSearchParams(paramsString);
         const page = urlParams.get('page');
-        return page ? parseInt(page, 10) : 1;
+        const pageNumber = page ? parseInt(page, 10) : 1;
+        if (isNaN(pageNumber) || pageNumber < 1) {
+            return 1;
+        }
+        return pageNumber;
     }
 
     getPaginationRange(currentPage: number, pageSize: number, totalItems: number): string {

@@ -1,133 +1,77 @@
-import { Component, signal, input, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { AccessPermission } from '../models/posts.interface';
+import { Component, OnInit, inject } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AccessPermission, PostRequestBody, PostsModel } from '../models/posts.interface';
 import { CommonModule } from '@angular/common';
-import { PostRequestBody } from '../models/posts.interface';
 import { Header } from '../header/header';
+import { MatIconModule } from '@angular/material/icon';
+import { PostFormBase } from '../post-form-base/post-form-base';
 
-const PERMISSION_LEVELS: { [key: string]: number } = {
-  'Read & Edit': 2,
-  'Read Only': 1,
-  'None': 0
-};
-
-const PERMISSION_HIERARCHY = ['Read & Edit', 'Read Only', 'None'];
-
-function permissionHierarchyValidator(): ValidatorFn {
-  return (control: AbstractControl): ValidationErrors | null => {
-    const teamAccess = control.get('team_access')?.value as AccessPermission;
-    const authenticatedAccess = control.get('authenticated_access')?.value as AccessPermission;
-    const publicAccess = control.get('public_access')?.value as 'Read Only' | 'None';
-
-    if (!teamAccess || !authenticatedAccess || !publicAccess) {
-        return null; // Permitir que Validators.required maneje los errores de campos vacíos
-    }
-
-    const teamLevel = PERMISSION_LEVELS[teamAccess];
-    const authenticatedLevel = PERMISSION_LEVELS[authenticatedAccess];
-    const publicLevel = PERMISSION_LEVELS[publicAccess];
-
-    // team_access no puede ser menor que authenticated_access
-    if (teamLevel < authenticatedLevel) {
-      return { teamAccessHierarchy: true };
-    }
-
-    // authenticated_access no puede ser menor que public_access
-    if (authenticatedLevel < publicLevel) {
-      return { authenticatedAccessHierarchy: true };
-    }
-
-    return null;
-  };
-}
+import { EditorModule } from '@tinymce/tinymce-angular';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-post-create',
   standalone: true,
-  imports: [ ReactiveFormsModule, CommonModule, Header],
+  imports: [ReactiveFormsModule, CommonModule, Header, MatIconModule, EditorModule, MatSnackBarModule],
   templateUrl: './post-create.html',
   styleUrl: './post-create.scss',
 })
-export class PostCreate {
+export class PostCreate extends PostFormBase implements OnInit{
 
-  isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
-  successMessage = signal<string | null>(null);
-
-  teamOptions = [
-    { value: AccessPermission.READ_AND_EDIT, label: AccessPermission.READ_AND_EDIT },
-    { value: AccessPermission.READ_ONLY, label: AccessPermission.READ_ONLY },
-    { value: AccessPermission.NONE, label: AccessPermission.NONE },
-  ];
-
-  authenticatedOptions = [
-    { value: AccessPermission.READ_AND_EDIT, label: AccessPermission.READ_AND_EDIT },
-    { value: AccessPermission.READ_ONLY, label: AccessPermission.READ_ONLY },
-    { value: AccessPermission.NONE, label: AccessPermission.NONE },
-  ];
-
-  publicOptions = [
-    { value: AccessPermission.READ_ONLY, label: AccessPermission.READ_ONLY },
-    { value: AccessPermission.NONE, label: AccessPermission.NONE },
-  ];
-
-  postForm!: FormGroup;
-  private fb = inject(FormBuilder);
+  private snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
-    this.postForm = this.fb.group({
-      title: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-      content: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-      // Valores por defecto
-      team_access: new FormControl(AccessPermission.READ_ONLY, { nonNullable: true, validators: [Validators.required] }),
-      authenticated_access: new FormControl(AccessPermission.READ_ONLY, { nonNullable: true, validators: [Validators.required] }),
-      public_access: new FormControl('Read Only', { nonNullable: true, validators: [Validators.required] }),
-    }, {
-      // Validador de jerarquía a nivel de formulario
-      validators: [permissionHierarchyValidator()]
-    });
-  }
-  isFieldInvalid(field: string): boolean {
-    const control = this.postForm.get(field);
-    return !!control && control.hasError('required') && (control.dirty || control.touched);
+      this.checkAuthAndProceed(() => {
+        this.initForm(); // Inicializa el formulario SOLO si el usuario está autenticado
+      });
   }
 
-  isHierarchyError(): boolean {
-    return this.postForm.hasError('teamAccessHierarchy') || this.postForm.hasError('authenticatedAccessHierarchy');
-  }
-
-  onCreatePost(): void {
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
-
-    if (this.postForm.invalid || this.isHierarchyError()) {
-      this.postForm.markAllAsTouched();
-      
-      let message = 'Por favor, corrige los errores del formulario.';
-      if (this.isHierarchyError()) {
-        message = 'Error de validación: La jerarquía de permisos no se respeta.';
-      } else if (this.postForm.hasError('required')) {
-        message = 'Por favor, completa los campos de Título y Contenido.';
+  onSubmit(): void {
+      if (this.postForm.invalid) {
+        this.postForm.markAllAsTouched();
+        this.snackBar.open('Por favor, completa los campos obligatorios título y contenido', '', {
+        duration: 4000,
+      });
+        return;
       }
-      
-      this.errorMessage.set(message);
-      return;
-    }
-
     this.isLoading.set(true);
     
-    // Construir el cuerpo de la solicitud (Request Body)
+    // Construir el cuerpo de la solicitud
     const formValue = this.postForm.getRawValue();
+    const excerptHTML = this.getStyledExcerpt(formValue.content, 200);
 
     const requestBody: PostRequestBody = {
       title: formValue.title,
       content: formValue.content,
-      // Propiedad de acceso fija para el autor
-      author_access: 'Read & Edit',
+      excerpt: excerptHTML,
+      author_access: AccessPermission.READ_AND_WRITE,
       team_access: formValue.team_access,
       authenticated_access: formValue.authenticated_access,
       public_access: formValue.public_access,
     };
+    
+    this.postsService.createPost(requestBody).subscribe({
+        next: (response: PostsModel) => {
+            this.isLoading.set(false);
+            this.snackBar.open('Post creado con éxito', '', {
+              duration: 4000
+            });
+            
+            if (response.id) {
+                 this.router.navigate(['/posts', response.id]); 
+            } else {
+                 this.router.navigate(['/posts']); 
+            }
+        },
+        error: (err) => {
+            this.isLoading.set(false);
+            const errorMsg = err.error?.detail || 'Error al intentar crear el post';
+            
+            this.snackBar.open(`Error de creación: ${errorMsg}`, '', {
+              duration: 4000
+            });
+        }
+    });
   }
 
   onCancel(): void {
@@ -138,8 +82,11 @@ export class PostCreate {
       authenticated_access: AccessPermission.READ_ONLY,
       public_access: 'Read Only'
     });
-    this.errorMessage.set(null);
-    this.successMessage.set(null);
-    console.log('Creación de post cancelada y formulario reseteado.');
+    this.snackBar.open('Creación cancelada', '', { duration: 4000 });
+    this.router.navigate(['/posts']);
+  }
+
+  goToPosts(): void {
+    this.router.navigate(['/posts']);
   }
 }
